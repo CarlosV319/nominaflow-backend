@@ -117,14 +117,6 @@ export const downloadReceiptPDF = async (req, res) => {
     }
 
     try {
-        console.log('--- START PDF GENERATION ---');
-        console.log('Receipt ID:', id);
-        console.log('Receipt Found:', !!receipt);
-        if (receipt) {
-            console.log('Receipt Employee:', receipt.employeeSnapshot?.apellido);
-            console.log('Receipt Company:', receipt.companySnapshot?.razonSocial);
-        }
-
         const { generateReceiptPDF } = await import('../services/pdfService.js');
         const pdfBuffer = await generateReceiptPDF(receipt);
 

@@ -151,21 +151,10 @@ handlebars.registerHelper('numberToWords', function (value) {
 
 export const generateReceiptPDF = async (receiptData) => {
     try {
-        console.log('PDF Service: Starting generation...');
-        console.log('Receipt Data received:', receiptData ? 'Yes' : 'No');
-
         const __dirname = path.dirname(fileURLToPath(import.meta.url));
         const templatePath = path.join(__dirname, '../templates/receipt.hbs');
-        console.log('Template Path:', templatePath);
-
-        if (!fs.existsSync(templatePath)) {
-            console.error('Template file does not exist at:', templatePath);
-            throw new Error('Template file missing');
-        }
 
         const templateHtml = fs.readFileSync(templatePath, 'utf-8');
-        console.log('Template Read Success. Length:', templateHtml.length);
-
         const template = handlebars.compile(templateHtml);
 
         // Formatear fecha de ingreso
@@ -202,12 +191,9 @@ export const generateReceiptPDF = async (receiptData) => {
             },
             isFinal: true
         };
-        console.log('Context prepared for template.');
 
         const html = template(context);
-        console.log('HTML generated from template. Length:', html.length);
 
-        console.log('Launching Puppeteer...');
         // Instancia Puppeteer
         const browser = await puppeteer.launch({
             headless: 'new',
@@ -222,15 +208,12 @@ export const generateReceiptPDF = async (receiptData) => {
             ],
             // executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || null, // Opcional si se usa Chrome del sistema
         });
-        console.log('Puppeteer launched.');
 
         const page = await browser.newPage();
-        console.log('New page created.');
 
         await page.setContent(html, {
             waitUntil: 'networkidle0'
         });
-        console.log('Page content set.');
 
         const pdfBuffer = await page.pdf({
             format: 'A4',
@@ -243,16 +226,13 @@ export const generateReceiptPDF = async (receiptData) => {
                 left: '1cm'
             }
         });
-        console.log('PDF generated. Buffer size:', pdfBuffer.length);
 
         await browser.close();
-        console.log('Browser closed. Returning buffer.');
 
         return pdfBuffer;
 
     } catch (error) {
         console.error('Error generando PDF de recibo:', error);
-        console.error('Stack:', error.stack);
-        throw new Error('Falló la generación del PDF: ' + error.message);
+        throw new Error('Falló la generación del PDF');
     }
 };
