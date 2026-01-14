@@ -51,7 +51,12 @@ app.use(cookieParser());
 
 // CORS Policy
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: [
+        'http://localhost:5173',
+        'https://nomina-flow-n9e856aiw-nominaflow.vercel.app', // Deploy de prueba específico
+        'https://nomina-flow.vercel.app', // Dominio de producción (si existe)
+        process.env.CLIENT_URL // Variable de entorno opcional
+    ],
     credentials: true,
 }));
 
