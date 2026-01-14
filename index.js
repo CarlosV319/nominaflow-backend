@@ -53,10 +53,10 @@ app.use(cookieParser());
 app.use(cors({
     origin: [
         'http://localhost:5173',
-        'https://nomina-flow-n9e856aiw-nominaflow.vercel.app', // Deploy de prueba específico
-        'https://nomina-flow.vercel.app', // Dominio de producción (si existe)
-        process.env.CLIENT_URL // Variable de entorno opcional
-    ],
+        /^https:\/\/nomina-flow-.*\.vercel\.app$/, // Permite cualquier preview de Vercel
+        'https://nomina-flow.vercel.app',
+        process.env.CLIENT_URL
+    ].filter(Boolean),
     credentials: true,
 }));
 
