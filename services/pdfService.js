@@ -195,11 +195,19 @@ export const generateReceiptPDF = async (receiptData) => {
         const html = template(context);
 
         // Instancia Puppeteer
-        const browser = await puppeteer.launch({
+       const browser = await puppeteer.launch({
             headless: 'new',
-            args: ['--no-sandbox', '--disable-setuid-sandbox']
+            args: [
+                '--no-sandbox',
+                '--disable-setuid-sandbox',
+                '--disable-dev-shm-usage', // Vital para entornos limitados como Render/Docker
+                '--disable-accelerated-2d-canvas',
+                '--no-first-run',
+                '--no-zygote',
+                '--disable-gpu'
+            ],
+            // executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || null, // Opcional si se usa Chrome del sistema
         });
-
         const page = await browser.newPage();
 
         await page.setContent(html, {
