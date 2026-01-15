@@ -129,6 +129,6 @@ export const downloadReceiptPDF = async (req, res) => {
         res.send(pdfBuffer);
     } catch (error) {
         console.error('PDF Gen Error:', error);
-        throw new AppError('Error generando el PDF', 500);
+        throw new AppError(`Error generando el PDF: ${error.message}`, 500);
     }
 };

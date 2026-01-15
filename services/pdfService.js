@@ -233,6 +233,6 @@ export const generateReceiptPDF = async (receiptData) => {
 
     } catch (error) {
         console.error('Error generando PDF de recibo:', error);
-        throw new Error('Falló la generación del PDF');
+        throw new Error(`Falló la generación del PDF: ${error.message}`);
     }
 };
