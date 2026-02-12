@@ -53,7 +53,8 @@ export const createReceipt = async (req, res) => {
             cargo: employee.cargo,
             cbu: employee.cbu,
             fechaIngreso: employee.fechaIngreso,
-            banco: employee.banco // Aseguramos que pase el banco
+            banco: employee.banco, // Aseguramos que pase el banco
+            legajo: employee.legajo
         },
         companySnapshot: {
             razonSocial: company.razonSocial,

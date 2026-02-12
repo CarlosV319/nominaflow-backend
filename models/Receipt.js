@@ -27,7 +27,9 @@ const receiptSchema = new mongoose.Schema({
         cuil: { type: String, required: true },
         cargo: { type: String, required: true },
         cbu: { type: String, required: true },
-        fechaIngreso: { type: Date, required: true }
+        banco: { type: String }, // Opcional
+        fechaIngreso: { type: Date, required: true },
+        legajo: { type: String, required: true } // Agregado para recibo
     },
     companySnapshot: {
         razonSocial: { type: String, required: true },
