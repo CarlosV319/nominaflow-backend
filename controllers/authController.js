@@ -75,3 +75,67 @@ export const getMe = async (req, res) => {
         data: user,
     });
 };
+
+// @desc    Actualizar detalles del usuario (nombre, email)
+// @route   PUT /api/auth/updatedetails
+// @access  Private
+export const updateDetails = async (req, res) => {
+    const fieldsToUpdate = {
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        email: req.body.email
+    };
+
+    const user = await User.findById(req.user.id);
+    if (!user) {
+        throw new AppError('Usuario no encontrado', 404);
+    }
+
+    // Si intenta cambiar el email, ver si ya existe otro
+    if (fieldsToUpdate.email && fieldsToUpdate.email !== user.email) {
+        const userExists = await User.findOne({ email: fieldsToUpdate.email });
+        if (userExists) {
+            throw new AppError('El email ya está en uso por otro usuario', 400);
+        }
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(req.user.id, fieldsToUpdate, {
+        new: true,
+        runValidators: true
+    });
+
+    res.status(200).json({
+        status: 'success',
+        data: updatedUser
+    });
+};
+
+// @desc    Actualizar contraseña
+// @route   PUT /api/auth/updatepassword
+// @access  Private
+export const updatePassword = async (req, res) => {
+    const { currentPassword, newPassword } = req.body;
+
+    // 1. Obtener usuario con password
+    const user = await User.findById(req.user.id).select('+password');
+
+    // 2. Verificar password actual
+    if (!(await user.matchPassword(currentPassword))) {
+        throw new AppError('La contraseña actual es incorrecta', 401);
+    }
+
+    // 3. Actualizar password
+    user.password = newPassword;
+    await user.save(); // Middleware hash se encarga de encriptar
+
+    // 4. Enviar respuesta (opcional: generar nuevo token)
+    // Por simplicidad, solo confirmamos éxito y el cliente puede seguir usando su token actual si no expira
+    // Opcionalmente podríamos enviar un nuevo token.
+    const token = generateToken(user._id);
+
+    res.status(200).json({
+        status: 'success',
+        token, // Enviamos nuevo token por si acaso
+        message: 'Contraseña actualizada correctamente'
+    });
+};
