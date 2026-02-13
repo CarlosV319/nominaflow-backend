@@ -24,25 +24,47 @@
         /* Adjusted font sizes */
         .text-body {
             font-size: 8px;
-            /* User requested 8px for data */
             line-height: 1.25;
         }
 
         .text-title {
             font-size: 10px;
-            /* User requested 10px for titles */
             font-weight: 700;
         }
 
         .text-number {
             font-size: 9px;
             letter-spacing: -0.025em;
-            /* tracking-tight */
             white-space: nowrap;
         }
 
         .bg-header {
             background-color: #F3F4F6;
+        }
+
+        /* Custom Widths for alignment */
+        .w-col-codigo {
+            width: 8%;
+        }
+
+        .w-col-concepto {
+            width: 33%;
+        }
+
+        .w-col-unidades {
+            width: 9%;
+        }
+
+        .w-col-haberes {
+            width: 16%;
+        }
+
+        .w-col-norem {
+            width: 17%;
+        }
+
+        .w-col-descuento {
+            width: 17%;
         }
     </style>
 </head>
@@ -62,7 +84,7 @@
                         <div class="flex flex-col gap-0.5 w-2/3 overflow-hidden">
                             <h1 class="text-base font-bold text-slate-800 uppercase leading-tight truncate">
                                 {{company.razonSocial}}</h1>
-                            <p class="text-[9px] font-normal text-slate-500 whitespace-nowrap">CUIT: <span
+                            <p class="text-[9px] font-normal text-slate-500 whitespace-nowrap">N° C.U.I.T. <span
                                     class="font-semibold text-slate-700">{{company.cuit}}</span></p>
                             <p class="text-[9px] font-normal text-slate-500 w-full truncate leading-tight">
                                 {{company.domicilio}}</p>
@@ -89,107 +111,127 @@
                         </div>
                     </header>
 
-                    <!-- SUB-HEADER: Employee Grid (2 cols) -->
-                    <section class="flex-shrink-0 border-b border-slate-300">
-                        <div class="grid grid-cols-2 divide-x divide-slate-300 text-[9px]">
-                            <!-- Block 1 -->
-                            <div class="flex flex-col overflow-hidden">
-                                <div
-                                    class="bg-header px-2 py-1 font-bold uppercase text-slate-600 border-b border-slate-200 truncate">
-                                    Legajo</div>
-                                <div
-                                    class="px-2 py-1 font-bold text-slate-800 border-b border-slate-200 min-h-[1.25rem]">
-                                    {{employee.legajo}}</div>
-                                <div
-                                    class="bg-header px-2 py-1 font-bold uppercase text-slate-600 border-b border-slate-200 truncate">
-                                    Tarea / Cargo</div>
-                                <div class="px-2 py-1 font-semibold text-slate-800 truncate" title="{{employee.cargo}}">
-                                    {{employee.cargo}}</div>
+                    <!-- SUB-HEADER: Employee Grid -->
+                    <section class="flex-shrink-0 border-b border-slate-300 bg-white">
+                        <!-- ROW 1 -->
+                        <div class="grid grid-cols-12 divide-x divide-slate-300 text-[9px] border-b border-slate-300">
+                            <div
+                                class="col-span-1 bg-header px-1 py-1 font-bold uppercase text-slate-600 truncate text-center">
+                                Q</div>
+                            <div
+                                class="col-span-1 bg-header px-1 py-1 font-bold uppercase text-slate-600 truncate text-center">
+                                Mes</div>
+                            <div
+                                class="col-span-1 bg-header px-1 py-1 font-bold uppercase text-slate-600 truncate text-center">
+                                Año</div>
+                            <div
+                                class="col-span-1 bg-header px-1 py-1 font-bold uppercase text-slate-600 truncate text-center">
+                                C.Costo</div>
+                            <div
+                                class="col-span-2 bg-header px-1 py-1 font-bold uppercase text-slate-600 truncate text-center">
+                                N° Legajo</div>
+                            <div class="col-span-4 bg-header px-1 py-1 font-bold uppercase text-slate-600 truncate">
+                                Apellido y Nombre</div>
+                            <div
+                                class="col-span-2 bg-header px-1 py-1 font-bold uppercase text-slate-600 truncate text-right">
+                                Sueldo/Jornal</div>
+                        </div>
+                        <div class="grid grid-cols-12 divide-x divide-slate-300 text-[9px] border-b border-slate-300">
+                            <div class="col-span-1 px-1 py-1 text-slate-800 text-center">-</div>
+                            <div class="col-span-1 px-1 py-1 font-bold text-slate-800 text-center">{{periodo.mesNombre}}
                             </div>
-                            <!-- Block 2 -->
-                            <div class="flex flex-col overflow-hidden">
-                                <div
-                                    class="bg-header px-2 py-1 font-bold uppercase text-slate-600 border-b border-slate-200 truncate">
-                                    Apellido y Nombre</div>
-                                <div class="px-2 py-1 font-bold text-slate-800 truncate border-b border-slate-200"
-                                    title="{{employee.fullName}}">{{employee.fullName}}</div>
-                                <div
-                                    class="bg-header px-2 py-1 font-bold uppercase text-slate-600 border-b border-slate-200 truncate">
-                                    CBU</div>
-                                <div class="px-2 py-1 font-mono text-slate-800 truncate text-[8px]">{{employee.cbu}}
-                                </div>
+                            <div class="col-span-1 px-1 py-1 font-bold text-slate-800 text-center">{{periodo.anio}}
                             </div>
-                            <!-- Block 3 -->
-                            <div class="flex flex-col border-t border-slate-300 overflow-hidden">
-                                <div
-                                    class="bg-header px-2 py-1 font-bold uppercase text-slate-600 border-b border-slate-200 truncate">
-                                    C.U.I.L.</div>
-                                <div
-                                    class="px-2 py-1 font-bold text-slate-800 whitespace-nowrap border-b border-slate-200">
-                                    {{employee.cuil}}</div>
-                                <div
-                                    class="bg-header px-2 py-1 font-bold uppercase text-slate-600 border-b border-slate-200 truncate">
-                                    Banco</div>
-                                <div class="px-2 py-1 font-semibold text-slate-800 truncate"
-                                    title="{{employee.bancoInfo}}">{{employee.bancoInfo}}</div>
+                            <div class="col-span-1 px-1 py-1 text-slate-800 text-center truncate">
+                                {{employee.centroCosto}}</div>
+                            <div class="col-span-2 px-1 py-1 font-bold text-slate-800 text-center">{{employee.legajo}}
                             </div>
-                            <!-- Block 4 -->
-                            <div class="flex flex-col border-t border-slate-300 overflow-hidden">
-                                <div
-                                    class="bg-header px-2 py-1 font-bold uppercase text-slate-600 border-b border-slate-200 truncate">
-                                    Fecha Ingreso</div>
-                                <div
-                                    class="px-2 py-1 font-bold text-slate-800 whitespace-nowrap border-b border-slate-200">
-                                    {{employee.fechaIngreso}}</div>
-                                <div
-                                    class="bg-header px-2 py-1 font-bold uppercase text-slate-600 border-b border-slate-200 truncate">
-                                    Último Depósito</div>
-                                <div class="px-2 py-1 text-slate-800 whitespace-nowrap truncate">
-                                    {{employee.fechaUltimoDeposito}}</div>
+                            <div class="col-span-4 px-1 py-1 font-bold text-slate-800 truncate">{{employee.fullName}}
+                            </div>
+                            <div class="col-span-2 px-1 py-1 font-bold text-slate-800 text-right">
+                                {{employee.sueldoBasico}}</div>
+                        </div>
+
+                        <!-- ROW 2 -->
+                        <div class="grid grid-cols-12 divide-x divide-slate-300 text-[9px]">
+                            <div class="col-span-2 bg-header px-1 py-1 font-bold uppercase text-slate-600 truncate">
+                                C.U.I.L</div>
+                            <div class="col-span-4 bg-header px-1 py-1 font-bold uppercase text-slate-600 truncate">
+                                Lugar de Trabajo</div>
+                            <div class="col-span-2 bg-header px-1 py-1 font-bold uppercase text-slate-600 truncate">
+                                Categoría</div>
+                            <div class="col-span-2 bg-header px-1 py-1 font-bold uppercase text-slate-600 truncate">
+                                Fecha Ingreso</div>
+                            <div
+                                class="col-span-2 bg-header px-1 py-1 font-bold uppercase text-slate-600 truncate text-center">
+                                Antigüedad</div>
+                        </div>
+                        <div class="grid grid-cols-12 divide-x divide-slate-300 text-[9px] border-b border-slate-300">
+                            <div class="col-span-2 px-1 py-1 font-bold text-slate-800">{{employee.cuil}}</div>
+                            <div class="col-span-4 px-1 py-1 text-slate-800 truncate">{{employee.lugarTrabajo}}</div>
+                            <div class="col-span-2 px-1 py-1 text-slate-800 truncate">{{employee.categoria}}</div>
+                            <div class="col-span-2 px-1 py-1 text-slate-800 text-center">{{employee.fechaIngreso}}</div>
+                            <div class="col-span-2 px-1 py-1 text-slate-800 text-center">{{employee.antiguedad}} años
+                            </div>
+                        </div>
+                        <!-- ROW 3 -->
+                        <div class="grid grid-cols-12 divide-x divide-slate-300 text-[9px]">
+                            <div class="col-span-2 bg-header px-1 py-1 font-bold uppercase text-slate-600 truncate">
+                                Tarea</div>
+                            <div class="col-span-4 px-1 py-1 text-slate-800 truncate">{{employee.cargo}}</div>
+                            <div class="col-span-2 bg-header px-1 py-1 font-bold uppercase text-slate-600 truncate">CBU
+                            </div>
+                            <div
+                                class="col-span-4 px-1 py-1 font-mono text-slate-800 truncate text-[9px] leading-tight flex items-center">
+                                {{employee.cbu}}
                             </div>
                         </div>
                     </section>
 
                     <!-- BODY: Concepts Table -->
-                    <div class="flex-grow overflow-hidden relative"> <!-- flex-grow to push footer -->
+                    <div class="flex-grow overflow-hidden relative">
                         <table class="w-full border-collapse table-fixed">
                             <thead class="bg-header border-b border-slate-300">
-                                <tr class="text-[9px] uppercase text-slate-600 tracking-tight">
-                                    <th class="px-2 py-1 text-left w-[8%] font-bold border-r border-slate-300 truncate">
+                                <tr class="text-[8px] uppercase text-slate-600 tracking-tight">
+                                    <th
+                                        class="px-2 py-1 text-left font-bold border-r border-slate-300 truncate w-col-codigo">
                                         Código</th>
                                     <th
-                                        class="px-2 py-1 text-left w-[37%] font-bold border-r border-slate-300 truncate">
+                                        class="px-2 py-1 text-left font-bold border-r border-slate-300 truncate w-col-concepto">
                                         Concepto</th>
                                     <th
-                                        class="px-2 py-1 text-center w-[8%] font-bold border-r border-slate-300 truncate">
+                                        class="px-1 py-1 text-center font-bold border-r border-slate-300 truncate w-col-unidades">
                                         Unidades</th>
                                     <th
-                                        class="px-2 py-1 text-right w-[15%] font-bold border-r border-slate-300 truncate">
+                                        class="px-2 py-1 text-right font-bold border-r border-slate-300 truncate w-col-haberes">
                                         Haberes</th>
                                     <th
-                                        class="px-2 py-1 text-right w-[15%] font-bold border-r border-slate-300 truncate">
-                                        No Rem.</th>
-                                    <th class="px-2 py-1 text-right w-[17%] font-bold truncate">Descuento</th>
+                                        class="px-2 py-1 text-right font-bold border-r border-slate-300 truncate w-col-norem">
+                                        No Remunerativo</th>
+                                    <th class="px-2 py-1 text-right font-bold truncate w-col-descuento">Descuentos</th>
                                 </tr>
                             </thead>
                             <tbody class="text-body text-slate-700 divide-y divide-slate-100 align-top">
                                 {{#each items}}
                                 <tr class="hover:bg-slate-50">
                                     <td
-                                        class="px-2 py-1 border-r border-slate-200 text-slate-500 font-mono text-number text-left">
+                                        class="px-2 py-1 border-r border-slate-200 text-slate-500 font-mono text-number text-left w-col-codigo">
                                         {{this.codigo}}</td>
                                     <td
-                                        class="px-2 py-1 border-r border-slate-200 font-medium break-words whitespace-normal leading-tight text-left">
+                                        class="px-2 py-1 border-r border-slate-200 font-medium break-words whitespace-normal leading-tight text-left w-col-concepto">
                                         {{this.concepto}}</td>
-                                    <td class="px-2 py-1 border-r border-slate-200 text-center text-number">{{#if
-                                        this.unidades}}{{this.unidades}}{{/if}}</td>
-                                    <td class="px-2 py-1 border-r border-slate-200 text-right font-mono text-number">
+                                    <td
+                                        class="px-1 py-1 border-r border-slate-200 text-center text-number w-col-unidades">
+                                        {{#if this.unidades}}{{this.unidades}}{{/if}}</td>
+                                    <td
+                                        class="px-2 py-1 border-r border-slate-200 text-right font-mono text-number w-col-haberes">
                                         {{#if this.isRemunerativo}}{{fmtCurrency this.montoRemunerativo}}{{/if}}</td>
-                                    <td class="px-2 py-1 border-r border-slate-200 text-right font-mono text-number">
+                                    <td
+                                        class="px-2 py-1 border-r border-slate-200 text-right font-mono text-number w-col-norem">
                                         {{#if this.isNoRemunerativo}}{{fmtCurrency this.montoNoRemunerativo}}{{/if}}
                                     </td>
-                                    <td class="px-2 py-1 text-right font-mono text-red-600 text-number">{{#if
-                                        this.isDeduccion}}{{fmtCurrency this.montoDeduccion}}{{/if}}</td>
+                                    <td class="px-2 py-1 text-right font-mono text-red-600 text-number w-col-descuento">
+                                        {{#if this.isDeduccion}}{{fmtCurrency this.montoDeduccion}}{{/if}}</td>
                                 </tr>
                                 {{/each}}
                             </tbody>
@@ -199,47 +241,82 @@
                     <!-- FOOTER: Totals & Signatures -->
                     <footer
                         class="flex-shrink-0 mt-auto border-t-2 border-slate-800 bg-white shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
-                        <div class="grid grid-cols-12 divide-x divide-slate-300 border-b border-slate-300">
-                            <div class="col-span-6 px-2 py-1 flex items-center bg-zinc-50 overflow-hidden">
+
+                        <!-- Totals Row: Aligned with Table Columns -->
+                        <div class="flex border-b border-slate-300 bg-zinc-50 text-[9px]">
+                            <!-- Spacer corresponding to Codigo + Concepto + Unidades (8+33+9 = 50%) -->
+                            <div class="w-[50%] border-r border-slate-300 bg-white"></div>
+
+                            <!-- Total Haberes (Bruto) -->
+                            <div class="w-[33%] border-r border-slate-300 flex items-center justify-end px-2 py-1">
+                                <span class="font-bold uppercase text-slate-500 mr-2">Total Haberes:</span>
+                                <span class="font-bold text-slate-800">{{fmtCurrency totals.bruto}}</span>
+                            </div>
+
+                            <!-- Total Descuentos -->
+                            <div
+                                class="w-[17%] flex flex-col items-end justify-center px-1 py-1 text-red-600 bg-red-50/30">
+                                <span class="text-[7px] font-bold uppercase leading-none">Total Descuentos</span>
+                                <span class="text-[9px] font-bold leading-none">{{fmtCurrency totals.descuentos}}</span>
+                            </div>
+                        </div>
+
+                        <!-- Net & Payment Info -->
+                        <div class="grid grid-cols-12 divide-x divide-slate-300 border-b border-slate-300 bg-white">
+                            <div class="col-span-8 px-2 py-1 flex flex-col justify-center">
+                                <span class="text-[8px] font-bold uppercase text-slate-500">Son Pesos:</span>
                                 <span
-                                    class="text-[8px] font-bold uppercase text-slate-500 mr-1 whitespace-nowrap shrink-0">Son
-                                    Pesos:</span>
-                                <span class="text-[9px] font-bold italic text-slate-800 leading-tight truncate"
-                                    title="{{numberToWords totals.neto}}">{{numberToWords totals.neto}}</span>
+                                    class="text-[9px] font-bold italic text-slate-800 leading-tight uppercase w-full truncate"
+                                    title="{{numberToWords totals.neto}}">
+                                    {{numberToWords totals.neto}}
+                                </span>
                             </div>
                             <div
-                                class="col-span-2 px-1 py-1 flex flex-col items-end justify-center bg-gray-50 overflow-hidden">
-                                <span
-                                    class="text-[8px] font-bold uppercase text-slate-500 whitespace-nowrap">Bruto</span>
-                                <span class="text-title font-bold text-slate-800 text-number">{{fmtCurrency
-                                    totals.bruto}}</span>
-                            </div>
-                            <div
-                                class="col-span-2 px-1 py-1 flex flex-col items-end justify-center bg-gray-50 overflow-hidden">
-                                <span
-                                    class="text-[8px] font-bold uppercase text-slate-500 whitespace-nowrap">Desc.</span>
-                                <span class="text-title font-bold text-red-600 text-number">{{fmtCurrency
-                                    totals.descuentos}}</span>
-                            </div>
-                            <div
-                                class="col-span-2 px-1 py-1 flex flex-col items-center justify-center bg-slate-800 text-white overflow-hidden">
-                                <span class="text-[8px] font-bold uppercase opacity-80 whitespace-nowrap">Neto</span>
-                                <span class="text-title font-bold text-number text-white">{{fmtCurrency
+                                class="col-span-4 px-2 py-1 flex flex-col items-center justify-center bg-slate-800 text-white">
+                                <span class="text-[8px] font-bold uppercase opacity-80">Neto a Pagar</span>
+                                <span class="text-[12px] font-bold text-white leading-none">{{fmtCurrency
                                     totals.neto}}</span>
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-8 p-4 pt-8">
-                            <div class="border-t border-dashed border-slate-400 pt-1 text-center relative">
-                                <p class="text-[8px] font-bold uppercase text-slate-400">Firma del Empleador</p>
+                        <!-- Payment Details -->
+                        <div
+                            class="grid grid-cols-12 divide-x divide-slate-300 border-b border-slate-300 bg-gray-50 text-[9px]">
+                            <div class="col-span-4 px-2 py-1 flex items-center">
+                                <span class="font-bold uppercase text-slate-500 mr-2">Periodo:</span>
+                                <span class="font-bold uppercase text-slate-800">{{periodo.mesNombre}}</span>
                             </div>
-                            <div class="border-t border-dashed border-slate-400 pt-1 text-center relative">
-                                <p class="text-[8px] font-bold uppercase text-slate-400">Firma del Empleado</p>
+                            <div class="col-span-4 px-2 py-1 flex items-center">
+                                <span class="font-bold uppercase text-slate-500 mr-2">Banco:</span>
+                                <span class="font-bold text-slate-800 truncate">{{employee.bancoInfo}}</span>
+                            </div>
+                            <div class="col-span-4 px-2 py-1 flex items-center justify-end">
+                                <span class="font-bold uppercase text-slate-500 mr-2">Fecha Pago:</span>
+                                <span class="font-bold text-slate-800">{{fechaPago}}</span>
                             </div>
                         </div>
 
-                        <div class="pb-1 text-center">
-                            <p class="text-[8px] text-slate-400 uppercase font-bold">ORIGINAL - EMPLEADO</p>
+                        <!-- Legal Text -->
+                        <div class="px-2 py-1 border-b border-slate-300 bg-white">
+                            <p class="text-[6px] text-slate-400 text-justify leading-tight">
+                                Recibí el importe de esta liquidación en pago de mi remuneración correspondiente al
+                                período indicado y duplicado de la misma conforme a la ley vigente.
+                            </p>
+                        </div>
+
+                        <!-- Signatures -->
+                        <div class="grid grid-cols-2 gap-8 p-3 pt-6">
+                            <div class="border-t border-dashed border-slate-400 pt-1 text-center relative">
+                                <p class="text-[7px] font-bold uppercase text-slate-400">Firma del Empleador</p>
+                            </div>
+                            <div class="border-t border-dashed border-slate-400 pt-1 text-center relative">
+                                <p class="text-[7px] font-bold uppercase text-slate-400">Firma del Empleado</p>
+                            </div>
+                        </div>
+
+                        <div class="pb-1 text-center bg-zinc-50">
+                            <p class="text-[8px] text-slate-400 uppercase font-bold tracking-widest">ORIGINAL - EMPLEADO
+                            </p>
                         </div>
                     </footer>
 
@@ -257,7 +334,7 @@
                         <div class="flex flex-col gap-0.5 w-2/3 overflow-hidden">
                             <h1 class="text-base font-bold text-slate-800 uppercase leading-tight truncate">
                                 {{company.razonSocial}}</h1>
-                            <p class="text-[9px] font-normal text-slate-500 whitespace-nowrap">CUIT: <span
+                            <p class="text-[9px] font-normal text-slate-500 whitespace-nowrap">N° C.U.I.T. <span
                                     class="font-semibold text-slate-700">{{company.cuit}}</span></p>
                             <p class="text-[9px] font-normal text-slate-500 w-full truncate leading-tight">
                                 {{company.domicilio}}</p>
@@ -284,107 +361,127 @@
                         </div>
                     </header>
 
-                    <!-- SUB-HEADER: Employee Grid (2 cols) -->
-                    <section class="flex-shrink-0 border-b border-slate-300">
-                        <div class="grid grid-cols-2 divide-x divide-slate-300 text-[9px]">
-                            <!-- Block 1 -->
-                            <div class="flex flex-col overflow-hidden">
-                                <div
-                                    class="bg-header px-2 py-1 font-bold uppercase text-slate-600 border-b border-slate-200 truncate">
-                                    Legajo</div>
-                                <div
-                                    class="px-2 py-1 font-bold text-slate-800 border-b border-slate-200 min-h-[1.25rem]">
-                                    {{employee.legajo}}</div>
-                                <div
-                                    class="bg-header px-2 py-1 font-bold uppercase text-slate-600 border-b border-slate-200 truncate">
-                                    Tarea / Cargo</div>
-                                <div class="px-2 py-1 font-semibold text-slate-800 truncate" title="{{employee.cargo}}">
-                                    {{employee.cargo}}</div>
+                    <!-- SUB-HEADER: Employee Grid -->
+                    <section class="flex-shrink-0 border-b border-slate-300 bg-white">
+                        <!-- ROW 1 -->
+                        <div class="grid grid-cols-12 divide-x divide-slate-300 text-[9px] border-b border-slate-300">
+                            <div
+                                class="col-span-1 bg-header px-1 py-1 font-bold uppercase text-slate-600 truncate text-center">
+                                Q</div>
+                            <div
+                                class="col-span-1 bg-header px-1 py-1 font-bold uppercase text-slate-600 truncate text-center">
+                                Mes</div>
+                            <div
+                                class="col-span-1 bg-header px-1 py-1 font-bold uppercase text-slate-600 truncate text-center">
+                                Año</div>
+                            <div
+                                class="col-span-1 bg-header px-1 py-1 font-bold uppercase text-slate-600 truncate text-center">
+                                C.Costo</div>
+                            <div
+                                class="col-span-2 bg-header px-1 py-1 font-bold uppercase text-slate-600 truncate text-center">
+                                N° Legajo</div>
+                            <div class="col-span-4 bg-header px-1 py-1 font-bold uppercase text-slate-600 truncate">
+                                Apellido y Nombre</div>
+                            <div
+                                class="col-span-2 bg-header px-1 py-1 font-bold uppercase text-slate-600 truncate text-right">
+                                Sueldo/Jornal</div>
+                        </div>
+                        <div class="grid grid-cols-12 divide-x divide-slate-300 text-[9px] border-b border-slate-300">
+                            <div class="col-span-1 px-1 py-1 text-slate-800 text-center">-</div>
+                            <div class="col-span-1 px-1 py-1 font-bold text-slate-800 text-center">{{periodo.mesNombre}}
                             </div>
-                            <!-- Block 2 -->
-                            <div class="flex flex-col overflow-hidden">
-                                <div
-                                    class="bg-header px-2 py-1 font-bold uppercase text-slate-600 border-b border-slate-200 truncate">
-                                    Apellido y Nombre</div>
-                                <div class="px-2 py-1 font-bold text-slate-800 truncate border-b border-slate-200"
-                                    title="{{employee.fullName}}">{{employee.fullName}}</div>
-                                <div
-                                    class="bg-header px-2 py-1 font-bold uppercase text-slate-600 border-b border-slate-200 truncate">
-                                    CBU</div>
-                                <div class="px-2 py-1 font-mono text-slate-800 truncate text-[8px]">{{employee.cbu}}
-                                </div>
+                            <div class="col-span-1 px-1 py-1 font-bold text-slate-800 text-center">{{periodo.anio}}
                             </div>
-                            <!-- Block 3 -->
-                            <div class="flex flex-col border-t border-slate-300 overflow-hidden">
-                                <div
-                                    class="bg-header px-2 py-1 font-bold uppercase text-slate-600 border-b border-slate-200 truncate">
-                                    C.U.I.L.</div>
-                                <div
-                                    class="px-2 py-1 font-bold text-slate-800 whitespace-nowrap border-b border-slate-200">
-                                    {{employee.cuil}}</div>
-                                <div
-                                    class="bg-header px-2 py-1 font-bold uppercase text-slate-600 border-b border-slate-200 truncate">
-                                    Banco</div>
-                                <div class="px-2 py-1 font-semibold text-slate-800 truncate"
-                                    title="{{employee.bancoInfo}}">{{employee.bancoInfo}}</div>
+                            <div class="col-span-1 px-1 py-1 text-slate-800 text-center truncate">
+                                {{employee.centroCosto}}</div>
+                            <div class="col-span-2 px-1 py-1 font-bold text-slate-800 text-center">{{employee.legajo}}
                             </div>
-                            <!-- Block 4 -->
-                            <div class="flex flex-col border-t border-slate-300 overflow-hidden">
-                                <div
-                                    class="bg-header px-2 py-1 font-bold uppercase text-slate-600 border-b border-slate-200 truncate">
-                                    Fecha Ingreso</div>
-                                <div
-                                    class="px-2 py-1 font-bold text-slate-800 whitespace-nowrap border-b border-slate-200">
-                                    {{employee.fechaIngreso}}</div>
-                                <div
-                                    class="bg-header px-2 py-1 font-bold uppercase text-slate-600 border-b border-slate-200 truncate">
-                                    Último Depósito</div>
-                                <div class="px-2 py-1 text-slate-800 whitespace-nowrap truncate">
-                                    {{employee.fechaUltimoDeposito}}</div>
+                            <div class="col-span-4 px-1 py-1 font-bold text-slate-800 truncate">{{employee.fullName}}
+                            </div>
+                            <div class="col-span-2 px-1 py-1 font-bold text-slate-800 text-right">
+                                {{employee.sueldoBasico}}</div>
+                        </div>
+
+                        <!-- ROW 2 -->
+                        <div class="grid grid-cols-12 divide-x divide-slate-300 text-[9px]">
+                            <div class="col-span-2 bg-header px-1 py-1 font-bold uppercase text-slate-600 truncate">
+                                C.U.I.L</div>
+                            <div class="col-span-4 bg-header px-1 py-1 font-bold uppercase text-slate-600 truncate">
+                                Lugar de Trabajo</div>
+                            <div class="col-span-2 bg-header px-1 py-1 font-bold uppercase text-slate-600 truncate">
+                                Categoría</div>
+                            <div class="col-span-2 bg-header px-1 py-1 font-bold uppercase text-slate-600 truncate">
+                                Fecha Ingreso</div>
+                            <div
+                                class="col-span-2 bg-header px-1 py-1 font-bold uppercase text-slate-600 truncate text-center">
+                                Antigüedad</div>
+                        </div>
+                        <div class="grid grid-cols-12 divide-x divide-slate-300 text-[9px] border-b border-slate-300">
+                            <div class="col-span-2 px-1 py-1 font-bold text-slate-800">{{employee.cuil}}</div>
+                            <div class="col-span-4 px-1 py-1 text-slate-800 truncate">{{employee.lugarTrabajo}}</div>
+                            <div class="col-span-2 px-1 py-1 text-slate-800 truncate">{{employee.categoria}}</div>
+                            <div class="col-span-2 px-1 py-1 text-slate-800 text-center">{{employee.fechaIngreso}}</div>
+                            <div class="col-span-2 px-1 py-1 text-slate-800 text-center">{{employee.antiguedad}} años
+                            </div>
+                        </div>
+                        <!-- ROW 3 -->
+                        <div class="grid grid-cols-12 divide-x divide-slate-300 text-[9px]">
+                            <div class="col-span-2 bg-header px-1 py-1 font-bold uppercase text-slate-600 truncate">
+                                Tarea</div>
+                            <div class="col-span-4 px-1 py-1 text-slate-800 truncate">{{employee.cargo}}</div>
+                            <div class="col-span-2 bg-header px-1 py-1 font-bold uppercase text-slate-600 truncate">CBU
+                            </div>
+                            <div
+                                class="col-span-4 px-1 py-1 font-mono text-slate-800 truncate text-[9px] leading-tight flex items-center">
+                                {{employee.cbu}}
                             </div>
                         </div>
                     </section>
 
                     <!-- BODY: Concepts Table -->
-                    <div class="flex-grow overflow-hidden relative"> <!-- flex-grow to push footer -->
+                    <div class="flex-grow overflow-hidden relative">
                         <table class="w-full border-collapse table-fixed">
                             <thead class="bg-header border-b border-slate-300">
-                                <tr class="text-[9px] uppercase text-slate-600 tracking-tight">
-                                    <th class="px-2 py-1 text-left w-[8%] font-bold border-r border-slate-300 truncate">
+                                <tr class="text-[8px] uppercase text-slate-600 tracking-tight">
+                                    <th
+                                        class="px-2 py-1 text-left font-bold border-r border-slate-300 truncate w-col-codigo">
                                         Código</th>
                                     <th
-                                        class="px-2 py-1 text-left w-[37%] font-bold border-r border-slate-300 truncate">
+                                        class="px-2 py-1 text-left font-bold border-r border-slate-300 truncate w-col-concepto">
                                         Concepto</th>
                                     <th
-                                        class="px-2 py-1 text-center w-[8%] font-bold border-r border-slate-300 truncate">
+                                        class="px-1 py-1 text-center font-bold border-r border-slate-300 truncate w-col-unidades">
                                         Unidades</th>
                                     <th
-                                        class="px-2 py-1 text-right w-[15%] font-bold border-r border-slate-300 truncate">
+                                        class="px-2 py-1 text-right font-bold border-r border-slate-300 truncate w-col-haberes">
                                         Haberes</th>
                                     <th
-                                        class="px-2 py-1 text-right w-[15%] font-bold border-r border-slate-300 truncate">
-                                        No Rem.</th>
-                                    <th class="px-2 py-1 text-right w-[17%] font-bold truncate">Descuento</th>
+                                        class="px-2 py-1 text-right font-bold border-r border-slate-300 truncate w-col-norem">
+                                        No Remunerativo</th>
+                                    <th class="px-2 py-1 text-right font-bold truncate w-col-descuento">Descuentos</th>
                                 </tr>
                             </thead>
                             <tbody class="text-body text-slate-700 divide-y divide-slate-100 align-top">
                                 {{#each items}}
                                 <tr class="hover:bg-slate-50">
                                     <td
-                                        class="px-2 py-1 border-r border-slate-200 text-slate-500 font-mono text-number text-left">
+                                        class="px-2 py-1 border-r border-slate-200 text-slate-500 font-mono text-number text-left w-col-codigo">
                                         {{this.codigo}}</td>
                                     <td
-                                        class="px-2 py-1 border-r border-slate-200 font-medium break-words whitespace-normal leading-tight text-left">
+                                        class="px-2 py-1 border-r border-slate-200 font-medium break-words whitespace-normal leading-tight text-left w-col-concepto">
                                         {{this.concepto}}</td>
-                                    <td class="px-2 py-1 border-r border-slate-200 text-center text-number">{{#if
-                                        this.unidades}}{{this.unidades}}{{/if}}</td>
-                                    <td class="px-2 py-1 border-r border-slate-200 text-right font-mono text-number">
+                                    <td
+                                        class="px-1 py-1 border-r border-slate-200 text-center text-number w-col-unidades">
+                                        {{#if this.unidades}}{{this.unidades}}{{/if}}</td>
+                                    <td
+                                        class="px-2 py-1 border-r border-slate-200 text-right font-mono text-number w-col-haberes">
                                         {{#if this.isRemunerativo}}{{fmtCurrency this.montoRemunerativo}}{{/if}}</td>
-                                    <td class="px-2 py-1 border-r border-slate-200 text-right font-mono text-number">
+                                    <td
+                                        class="px-2 py-1 border-r border-slate-200 text-right font-mono text-number w-col-norem">
                                         {{#if this.isNoRemunerativo}}{{fmtCurrency this.montoNoRemunerativo}}{{/if}}
                                     </td>
-                                    <td class="px-2 py-1 text-right font-mono text-red-600 text-number">{{#if
-                                        this.isDeduccion}}{{fmtCurrency this.montoDeduccion}}{{/if}}</td>
+                                    <td class="px-2 py-1 text-right font-mono text-red-600 text-number w-col-descuento">
+                                        {{#if this.isDeduccion}}{{fmtCurrency this.montoDeduccion}}{{/if}}</td>
                                 </tr>
                                 {{/each}}
                             </tbody>
@@ -394,47 +491,82 @@
                     <!-- FOOTER: Totals & Signatures -->
                     <footer
                         class="flex-shrink-0 mt-auto border-t-2 border-slate-800 bg-white shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
-                        <div class="grid grid-cols-12 divide-x divide-slate-300 border-b border-slate-300">
-                            <div class="col-span-6 px-2 py-1 flex items-center bg-zinc-50 overflow-hidden">
+
+                        <!-- Totals Row: Aligned with Table Columns -->
+                        <div class="flex border-b border-slate-300 bg-zinc-50 text-[9px]">
+                            <!-- Spacer corresponding to Codigo + Concepto + Unidades (8+33+9 = 50%) -->
+                            <div class="w-[50%] border-r border-slate-300 bg-white"></div>
+
+                            <!-- Total Haberes (Bruto) -->
+                            <div class="w-[33%] border-r border-slate-300 flex items-center justify-end px-2 py-1">
+                                <span class="font-bold uppercase text-slate-500 mr-2">Total Haberes:</span>
+                                <span class="font-bold text-slate-800">{{fmtCurrency totals.bruto}}</span>
+                            </div>
+
+                            <!-- Total Descuentos -->
+                            <div
+                                class="w-[17%] flex flex-col items-end justify-center px-1 py-1 text-red-600 bg-red-50/30">
+                                <span class="text-[7px] font-bold uppercase leading-none">Total Descuentos</span>
+                                <span class="text-[9px] font-bold leading-none">{{fmtCurrency totals.descuentos}}</span>
+                            </div>
+                        </div>
+
+                        <!-- Net & Payment Info -->
+                        <div class="grid grid-cols-12 divide-x divide-slate-300 border-b border-slate-300 bg-white">
+                            <div class="col-span-8 px-2 py-1 flex flex-col justify-center">
+                                <span class="text-[8px] font-bold uppercase text-slate-500">Son Pesos:</span>
                                 <span
-                                    class="text-[8px] font-bold uppercase text-slate-500 mr-1 whitespace-nowrap shrink-0">Son
-                                    Pesos:</span>
-                                <span class="text-[9px] font-bold italic text-slate-800 leading-tight truncate"
-                                    title="{{numberToWords totals.neto}}">{{numberToWords totals.neto}}</span>
+                                    class="text-[9px] font-bold italic text-slate-800 leading-tight uppercase w-full truncate"
+                                    title="{{numberToWords totals.neto}}">
+                                    {{numberToWords totals.neto}}
+                                </span>
                             </div>
                             <div
-                                class="col-span-2 px-1 py-1 flex flex-col items-end justify-center bg-gray-50 overflow-hidden">
-                                <span
-                                    class="text-[8px] font-bold uppercase text-slate-500 whitespace-nowrap">Bruto</span>
-                                <span class="text-title font-bold text-slate-800 text-number">{{fmtCurrency
-                                    totals.bruto}}</span>
-                            </div>
-                            <div
-                                class="col-span-2 px-1 py-1 flex flex-col items-end justify-center bg-gray-50 overflow-hidden">
-                                <span
-                                    class="text-[8px] font-bold uppercase text-slate-500 whitespace-nowrap">Desc.</span>
-                                <span class="text-title font-bold text-red-600 text-number">{{fmtCurrency
-                                    totals.descuentos}}</span>
-                            </div>
-                            <div
-                                class="col-span-2 px-1 py-1 flex flex-col items-center justify-center bg-slate-800 text-white overflow-hidden">
-                                <span class="text-[8px] font-bold uppercase opacity-80 whitespace-nowrap">Neto</span>
-                                <span class="text-title font-bold text-number text-white">{{fmtCurrency
+                                class="col-span-4 px-2 py-1 flex flex-col items-center justify-center bg-slate-800 text-white">
+                                <span class="text-[8px] font-bold uppercase opacity-80">Neto a Pagar</span>
+                                <span class="text-[12px] font-bold text-white leading-none">{{fmtCurrency
                                     totals.neto}}</span>
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-8 p-4 pt-8">
-                            <div class="border-t border-dashed border-slate-400 pt-1 text-center relative">
-                                <p class="text-[8px] font-bold uppercase text-slate-400">Firma del Empleador</p>
+                        <!-- Payment Details -->
+                        <div
+                            class="grid grid-cols-12 divide-x divide-slate-300 border-b border-slate-300 bg-gray-50 text-[9px]">
+                            <div class="col-span-4 px-2 py-1 flex items-center">
+                                <span class="font-bold uppercase text-slate-500 mr-2">Periodo:</span>
+                                <span class="font-bold uppercase text-slate-800">{{periodo.mesNombre}}</span>
                             </div>
-                            <div class="border-t border-dashed border-slate-400 pt-1 text-center relative">
-                                <p class="text-[8px] font-bold uppercase text-slate-400">Firma del Empleado</p>
+                            <div class="col-span-4 px-2 py-1 flex items-center">
+                                <span class="font-bold uppercase text-slate-500 mr-2">Banco:</span>
+                                <span class="font-bold text-slate-800 truncate">{{employee.bancoInfo}}</span>
+                            </div>
+                            <div class="col-span-4 px-2 py-1 flex items-center justify-end">
+                                <span class="font-bold uppercase text-slate-500 mr-2">Fecha Pago:</span>
+                                <span class="font-bold text-slate-800">{{fechaPago}}</span>
                             </div>
                         </div>
 
-                        <div class="pb-1 text-center">
-                            <p class="text-[8px] text-slate-400 uppercase font-bold">DUPLICADO - EMPLEADOR</p>
+                        <!-- Legal Text -->
+                        <div class="px-2 py-1 border-b border-slate-300 bg-white">
+                            <p class="text-[6px] text-slate-400 text-justify leading-tight">
+                                Recibí el importe de esta liquidación en pago de mi remuneración correspondiente al
+                                período indicado y duplicado de la misma conforme a la ley vigente.
+                            </p>
+                        </div>
+
+                        <!-- Signatures -->
+                        <div class="grid grid-cols-2 gap-8 p-3 pt-6">
+                            <div class="border-t border-dashed border-slate-400 pt-1 text-center relative">
+                                <p class="text-[7px] font-bold uppercase text-slate-400">Firma del Empleador</p>
+                            </div>
+                            <div class="border-t border-dashed border-slate-400 pt-1 text-center relative">
+                                <p class="text-[7px] font-bold uppercase text-slate-400">Firma del Empleado</p>
+                            </div>
+                        </div>
+
+                        <div class="pb-1 text-center bg-zinc-50">
+                            <p class="text-[8px] text-slate-400 uppercase font-bold tracking-widest">DUPLICADO -
+                                EMPLEADOR</p>
                         </div>
                     </footer>
 

@@ -29,7 +29,8 @@ const numeroALetras = (num) => {
     // Mejor: Agrego una función pequeña recursiva.
 };
 
-function Unidades(num) {
+// Función robusta para convertir número a letras (Pesos Argentinos)
+const Unidades = (num) => {
     switch (num) {
         case 1: return 'UN';
         case 2: return 'DOS';
@@ -42,9 +43,9 @@ function Unidades(num) {
         case 9: return 'NUEVE';
     }
     return '';
-}
+};
 
-function Decenas(num) {
+const Decenas = (num) => {
     let decena = Math.floor(num / 10);
     let unidad = num - (decena * 10);
     switch (decena) {
@@ -72,15 +73,14 @@ function Decenas(num) {
         case 9: return DecenasY('NOVENTA', unidad);
         case 0: return Unidades(unidad);
     }
-}
+};
 
-function DecenasY(strSin, numUnidades) {
-    if (numUnidades > 0)
-        return strSin + ' Y ' + Unidades(numUnidades)
+const DecenasY = (strSin, numUnidades) => {
+    if (numUnidades > 0) return strSin + ' Y ' + Unidades(numUnidades);
     return strSin;
-}
+};
 
-function Centenas(num) {
+const Centenas = (num) => {
     let centenas = Math.floor(num / 100);
     let decenas = num - (centenas * 100);
     switch (centenas) {
@@ -97,34 +97,47 @@ function Centenas(num) {
         case 9: return 'NOVECIENTOS ' + Decenas(decenas);
     }
     return Decenas(decenas);
-}
+};
 
-function Seccion(num, divisor, strSingular, strPlural) {
-    let cientos = Math.floor(num / divisor)
-    let resto = num - (cientos * divisor)
+const Seccion = (num, divisor, strSingular, strPlural) => {
+    let cientos = Math.floor(num / divisor);
+    let resto = num - (cientos * divisor);
     let letras = '';
-    if (cientos > 0)
+    if (cientos > 0) {
         if (cientos > 1) letras = Centenas(cientos) + ' ' + strPlural;
         else letras = strSingular;
-    if (resto > 0) letras += '';
+    }
+    if (resto > 0) {
+        letras += '';
+    }
     return letras;
-}
+};
 
-function Miles(num) {
+const Miles = (num) => {
     let divisor = 1000;
-    let cientos = Math.floor(num / divisor)
-    let resto = num - (cientos * divisor)
+    let cientos = Math.floor(num / divisor);
+    let resto = num - (cientos * divisor);
     let strMiles = Seccion(num, divisor, 'UN MIL', 'MIL');
     let strCentenas = Centenas(resto);
-    if (strMiles == '') return strCentenas;
+    if (strMiles === '') return strCentenas;
     return strMiles + ' ' + strCentenas;
-}
+};
 
-function NumeroALetras(num) {
+const Millones = (num) => {
+    let divisor = 1000000;
+    let cientos = Math.floor(num / divisor);
+    let resto = num - (cientos * divisor);
+    let strMillones = Seccion(num, divisor, 'UN MILLON', 'MILLONES');
+    let strMiles = Miles(resto);
+    if (strMillones === '') return strMiles;
+    return strMillones + ' ' + strMiles;
+};
+
+const NumeroALetras = (num) => {
     let data = {
         numero: num,
         enteros: Math.floor(num),
-        centavos: (((Math.round(num * 100)) - (Math.floor(num) * 100))),
+        centavos: Math.round((num - Math.floor(num)) * 100),
         letrasCentavos: '',
         letrasMonedaPlural: 'PESOS',
         letrasMonedaSingular: 'PESO',
@@ -134,15 +147,17 @@ function NumeroALetras(num) {
 
     if (data.centavos > 0) {
         data.letrasCentavos = 'CON ' + (function () {
-            if (data.centavos == 1) return Unidades(data.centavos) + ' ' + data.letrasMonedaCentavoSingular;
-            else return Decenas(data.centavos) + ' ' + data.letrasMonedaCentavoPlural;
+            if (data.centavos === 1) return Unidades(data.centavos) + '/100'; // + ' ' + data.letrasMonedaCentavoSingular;
+            else return data.centavos + '/100'; // Prefiero formato xx/100 para centavos en recibos
         })();
-    };
+    } else {
+        data.letrasCentavos = 'CON 00/100';
+    }
 
-    if (data.enteros == 0) return 'CERO ' + data.letrasMonedaPlural + ' ' + data.letrasCentavos;
-    if (data.enteros == 1) return Miles(data.enteros) + ' ' + data.letrasMonedaSingular + ' ' + data.letrasCentavos;
-    else return Miles(data.enteros) + ' ' + data.letrasMonedaPlural + ' ' + data.letrasCentavos;
-}
+    if (data.enteros === 0) return 'CERO ' + data.letrasMonedaPlural + ' ' + data.letrasCentavos;
+    if (data.enteros === 1) return Millones(data.enteros) + ' ' + data.letrasMonedaSingular + ' ' + data.letrasCentavos;
+    else return Millones(data.enteros) + ' ' + data.letrasMonedaPlural + ' ' + data.letrasCentavos;
+};
 
 handlebars.registerHelper('numberToWords', function (value) {
     return NumeroALetras(value);
@@ -170,19 +185,46 @@ export const generateReceiptPDF = async (receiptData) => {
                 fechaIngreso: formattedFechaIngreso,
                 // Si no hay banco, usar guión
                 bancoInfo: receiptData.employeeSnapshot.banco ? receiptData.employeeSnapshot.banco : '-',
-                fechaUltimoDeposito: '-' // Placeholder, el modelo no tiene este dato real aún
+                fechaUltimoDeposito: receiptData.fechaDeposito || '-', // Usamos fechaDeposito del recibo
+                // Nuevos campos
+                centroCosto: receiptData.employeeSnapshot.centroCosto || '',
+                lugarTrabajo: receiptData.employeeSnapshot.lugarTrabajo || '',
+                categoria: receiptData.employeeSnapshot.categoria || '',
+                sueldoBasico: receiptData.employeeSnapshot.sueldoBasico ? new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(receiptData.employeeSnapshot.sueldoBasico) : '-',
+                antiguedad: receiptData.employeeSnapshot.antiguedad || 0
             },
             periodo: {
                 mes: receiptData.periodo.mes.toString().padStart(2, '0'),
-                anio: receiptData.periodo.anio
+                anio: receiptData.periodo.anio,
+                mesNombre: new Date(receiptData.periodo.anio, receiptData.periodo.mes - 1).toLocaleString('es-AR', { month: 'long' }).toUpperCase() // Para "DICIEMBRE 2025"
             },
+            fechaPago: receiptData.fechaPago || '-',
             nroRecibo: String(receiptData._id).slice(-8).toUpperCase(), // Simulado con ID
-            items: receiptData.items.map(item => ({
-                ...item,
-                isRemunerativo: item.montoRemunerativo > 0,
-                isNoRemunerativo: item.montoNoRemunerativo > 0,
-                isDeduccion: item.montoDeduccion > 0
-            })),
+            items: receiptData.items.map(item => {
+                let unidadesFormatted = item.unidades;
+
+                // Smart Formatting Logic for Unidades
+                if (item.unidades) {
+                    const conceptoLower = (item.concepto || '').toLowerCase();
+                    // Exclude specific "count-based" concepts from getting a % sign
+                    // Sueldo Basico, Jornal, Dias, Horas, Feriado are typically counts/scalars
+                    const isScalar = /sueldo|básico|basico|jornal|dias|días|horas|feriado/.test(conceptoLower);
+
+                    // User Request: "en unidades para el sueldo basico no va el signo de %"
+                    // Implies generally they want % for everything else (like Deductions, Antiguedad percentage, etc.)
+                    if (!isScalar) {
+                        unidadesFormatted = `${item.unidades}%`;
+                    }
+                }
+
+                return {
+                    ...item,
+                    unidades: unidadesFormatted,
+                    isRemunerativo: item.montoRemunerativo > 0,
+                    isNoRemunerativo: item.montoNoRemunerativo > 0,
+                    isDeduccion: item.montoDeduccion > 0
+                };
+            }),
             totals: {
                 bruto: receiptData.totales.totalBruto,
                 neto: receiptData.totales.totalNeto,

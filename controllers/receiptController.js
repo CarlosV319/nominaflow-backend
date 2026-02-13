@@ -35,17 +35,33 @@ export const createReceipt = async (req, res) => {
     const totalBruto = totalRemunerativo + totalNoRemunerativo;
     const totalNeto = totalBruto - totalDeducciones;
 
+    // Cálculo de Antigüedad (Años completos)
+    const fechaIngreso = new Date(employee.fechaIngreso);
+    // Periodo es Objeto { mes, anio }
+    // Asumimos fecha de cálculo como el último día del mes del periodo
+    const fechaCalculo = new Date(periodo.anio, periodo.mes, 0); // Último día del mes
+    let antiguedad = fechaCalculo.getFullYear() - fechaIngreso.getFullYear();
+    const m = fechaCalculo.getMonth() - fechaIngreso.getMonth();
+    if (m < 0 || (m === 0 && fechaCalculo.getDate() < fechaIngreso.getDate())) {
+        antiguedad--;
+    }
+    antiguedad = Math.max(0, antiguedad);
+
     // Acción 2 y 4: Construcción del Snapshot y Guardado
     console.log('--- CREATING RECEIPT DEBUG ---');
     console.log('Employee:', employee.nombre);
-    console.log('Company:', company.razonSocial);
-    console.log('Company Domicilio Type:', typeof company.domicilio, company.domicilio);
+
+    // Extracción de datos extra del body (fechas pago/deposito)
+    const { fechaPago, fechaDeposito, bancoDeposito } = req.body;
 
     const receiptData = {
         user: req.user.id,
         company: company._id,
         employee: employee._id,
         periodo,
+        fechaPago: fechaPago || new Date().toLocaleDateString('es-AR'), // Default hoy si no viene
+        fechaDeposito: fechaDeposito || new Date().toLocaleDateString('es-AR'), // Default hoy si no viene
+        bancoDeposito: bancoDeposito || employee.banco || '',
         employeeSnapshot: {
             nombre: employee.nombre,
             apellido: employee.apellido,
@@ -53,8 +69,14 @@ export const createReceipt = async (req, res) => {
             cargo: employee.cargo,
             cbu: employee.cbu,
             fechaIngreso: employee.fechaIngreso,
-            banco: employee.banco, // Aseguramos que pase el banco
-            legajo: employee.legajo
+            banco: employee.banco,
+            legajo: employee.legajo,
+            // Nuevos Campos
+            centroCosto: employee.centroCosto,
+            lugarTrabajo: employee.lugarTrabajo,
+            categoria: employee.categoria,
+            sueldoBasico: employee.sueldoBruto, // Usamos sueldoBruto como base/jornal
+            antiguedad: antiguedad
         },
         companySnapshot: {
             razonSocial: company.razonSocial,
