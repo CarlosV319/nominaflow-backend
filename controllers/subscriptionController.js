@@ -12,9 +12,9 @@ export const getSubscriptionStatus = async (req, res, next) => {
         const user = await User.findById(req.user.id);
         if (!user) return next(new AppError('Usuario no encontrado', 404));
 
-        const plan = user.plan || 'FREE';
-        // Get limits based on plan or default to FREE
-        const limits = PLAN_LIMITS[plan] || PLAN_LIMITS.FREE;
+        const plan = user.plan || 'INICIAL';
+        // Get limits based on plan or default to INICIAL
+        const limits = PLAN_LIMITS[plan] || PLAN_LIMITS.INICIAL;
 
         // 1. Uso de Empresas
         const companiesUsed = await Company.countDocuments({ user: req.user.id });

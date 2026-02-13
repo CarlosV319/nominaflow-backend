@@ -4,11 +4,12 @@ import Receipt from '../models/Receipt.js';
 import AppError from '../utils/AppError.js';
 
 // 1. Configuración de Límites
+// 1. Configuración de Límites
 const PLAN_LIMITS = {
-    FREE: { companies: 1, receipts: 5 },
-    PRO: { companies: 10, receipts: 50 },
-    AGENCY: { companies: 50, receipts: 500 },
-    ENTERPRISE: { companies: Infinity, receipts: Infinity }
+    INICIAL: { companies: 1, receipts: 5 },
+    PROFESIONAL: { companies: 10, receipts: 50 },
+    ESTUDIO: { companies: 50, receipts: 500 },
+    CORPORATE: { companies: Infinity, receipts: 2000 }
 };
 
 // Helper para obtener límites según el usuario
@@ -16,9 +17,9 @@ const getLimits = async (userId) => {
     const user = await User.findById(userId);
     if (!user) throw new AppError('Usuario no encontrado', 404);
 
-    // Default a FREE si el plan no existe o es inválido
-    const plan = user.plan || 'FREE';
-    const limits = PLAN_LIMITS[plan] || PLAN_LIMITS.FREE;
+    // Default a INICIAL si el plan no existe o es inválido
+    const plan = user.plan || 'INICIAL';
+    const limits = PLAN_LIMITS[plan] || PLAN_LIMITS.INICIAL;
 
     return { plan, limits };
 };
