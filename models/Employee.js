@@ -58,6 +58,18 @@ const employeeSchema = new mongoose.Schema({
         type: Number,
         required: [true, 'El sueldo bruto es requerido'],
         min: 0
+    },
+    centroCosto: {
+        type: String,
+        default: ''
+    },
+    lugarTrabajo: {
+        type: String,
+        default: 'CIUDAD AUT.BS.AS.'
+    },
+    categoria: {
+        type: String,
+        default: ''
     }
 }, {
     timestamps: true

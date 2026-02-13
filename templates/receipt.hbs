@@ -17,7 +17,7 @@
         }
 
         @page {
-            size: A4 landscape;
+            size: A4 portrait;
             margin: 0.5cm;
         }
 
@@ -49,11 +49,11 @@
 
 <body class="bg-white text-slate-700 mx-auto w-full h-full">
 
-    <!-- MAIN WRAPPER: FLEX ROW FOR A4 LANDSCAPE SPLIT -->
-    <div class="w-full h-full flex flex-row">
+    <!-- MAIN WRAPPER: FLEX COL FOR A4 PORTRAIT SPLIT -->
+    <div class="w-full h-full flex flex-col">
 
-        <!-- LEFT SIDE: ORIGINAL (EMPLEADO) -->
-        <div class="w-1/2 h-full p-2 border-r-2 border-dashed border-slate-300">
+        <!-- TOP SIDE: ORIGINAL (EMPLEADO) -->
+        <div class="w-full h-1/2 p-2 border-b-2 border-dashed border-slate-300">
             <div style="transform: scale(0.95); transform-origin: top center;" class="h-full w-full">
                 <div class="w-full h-full flex flex-col justify-between border border-slate-400">
 
@@ -155,22 +155,21 @@
                         <table class="w-full border-collapse table-fixed">
                             <thead class="bg-header border-b border-slate-300">
                                 <tr class="text-[9px] uppercase text-slate-600 tracking-tight">
-                                    <th
-                                        class="px-2 py-1 text-left w-[10%] font-bold border-r border-slate-300 truncate">
+                                    <th class="px-2 py-1 text-left w-[8%] font-bold border-r border-slate-300 truncate">
                                         Código</th>
                                     <th
-                                        class="px-2 py-1 text-left w-[40%] font-bold border-r border-slate-300 truncate">
+                                        class="px-2 py-1 text-left w-[37%] font-bold border-r border-slate-300 truncate">
                                         Concepto</th>
                                     <th
-                                        class="px-2 py-1 text-center w-[5%] font-bold border-r border-slate-300 truncate">
-                                        Unid.</th>
+                                        class="px-2 py-1 text-center w-[8%] font-bold border-r border-slate-300 truncate">
+                                        Unidades</th>
                                     <th
                                         class="px-2 py-1 text-right w-[15%] font-bold border-r border-slate-300 truncate">
                                         Haberes</th>
                                     <th
                                         class="px-2 py-1 text-right w-[15%] font-bold border-r border-slate-300 truncate">
                                         No Rem.</th>
-                                    <th class="px-2 py-1 text-right w-[15%] font-bold truncate">Deduc.</th>
+                                    <th class="px-2 py-1 text-right w-[17%] font-bold truncate">Descuento</th>
                                 </tr>
                             </thead>
                             <tbody class="text-body text-slate-700 divide-y divide-slate-100 align-top">
@@ -248,8 +247,8 @@
             </div>
         </div>
 
-        <!-- RIGHT SIDE: DUPLICATE (EMPLEADOR) -->
-        <div class="w-1/2 h-full p-2">
+        <!-- BOTTOM SIDE: DUPLICATE (EMPLEADOR) -->
+        <div class="w-full h-1/2 p-2">
             <div style="transform: scale(0.95); transform-origin: top center;" class="h-full w-full">
                 <div class="w-full h-full flex flex-col justify-between border border-slate-400">
 
@@ -351,22 +350,21 @@
                         <table class="w-full border-collapse table-fixed">
                             <thead class="bg-header border-b border-slate-300">
                                 <tr class="text-[9px] uppercase text-slate-600 tracking-tight">
-                                    <th
-                                        class="px-2 py-1 text-left w-[10%] font-bold border-r border-slate-300 truncate">
+                                    <th class="px-2 py-1 text-left w-[8%] font-bold border-r border-slate-300 truncate">
                                         Código</th>
                                     <th
-                                        class="px-2 py-1 text-left w-[40%] font-bold border-r border-slate-300 truncate">
+                                        class="px-2 py-1 text-left w-[37%] font-bold border-r border-slate-300 truncate">
                                         Concepto</th>
                                     <th
-                                        class="px-2 py-1 text-center w-[5%] font-bold border-r border-slate-300 truncate">
-                                        Unid.</th>
+                                        class="px-2 py-1 text-center w-[8%] font-bold border-r border-slate-300 truncate">
+                                        Unidades</th>
                                     <th
                                         class="px-2 py-1 text-right w-[15%] font-bold border-r border-slate-300 truncate">
                                         Haberes</th>
                                     <th
                                         class="px-2 py-1 text-right w-[15%] font-bold border-r border-slate-300 truncate">
                                         No Rem.</th>
-                                    <th class="px-2 py-1 text-right w-[15%] font-bold truncate">Deduc.</th>
+                                    <th class="px-2 py-1 text-right w-[17%] font-bold truncate">Descuento</th>
                                 </tr>
                             </thead>
                             <tbody class="text-body text-slate-700 divide-y divide-slate-100 align-top">

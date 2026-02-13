@@ -29,8 +29,16 @@ const receiptSchema = new mongoose.Schema({
         cbu: { type: String, required: true },
         banco: { type: String }, // Opcional
         fechaIngreso: { type: Date, required: true },
-        legajo: { type: String, required: true } // Agregado para recibo
+        legajo: { type: String, required: true }, // Agregado para recibo
+        centroCosto: { type: String },
+        lugarTrabajo: { type: String },
+        categoria: { type: String },
+        sueldoBasico: { type: Number },
+        antiguedad: { type: Number } // Años calculados
     },
+    fechaPago: { type: String }, // DD/MM/AAAA
+    fechaDeposito: { type: String }, // DD/MM/AAAA
+    bancoDeposito: { type: String }, // Banco de depósito (si difiere o es para mostrar abajo)
     companySnapshot: {
         razonSocial: { type: String, required: true },
         cuit: { type: String, required: true },
