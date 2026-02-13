@@ -14,6 +14,7 @@ import authRoutes from './routes/auth.routes.js';
 import companyRoutes from './routes/company.routes.js';
 import employeeRoutes from './routes/employee.routes.js';
 import receiptRoutes from './routes/receipt.routes.js';
+import subscriptionRoutes from './routes/subscription.routes.js';
 
 import AppError from './utils/AppError.js';
 
@@ -65,6 +66,7 @@ app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/companies', companyRoutes);
 app.use('/api/v1/employees', employeeRoutes);
 app.use('/api/v1/receipts', receiptRoutes);
+app.use('/api/v1/subscription', subscriptionRoutes);
 
 // Basic Root Route
 app.get('/', (req, res) => {
@@ -98,7 +100,7 @@ app.use((err, req, res, next) => {
                 status: err.status,
                 message: err.message
             });
-         } else {
+        } else {
             console.error('ERROR 💥', err);
             // TEMPORARY DEBUG: Expose error details in production
             res.status(500).json({

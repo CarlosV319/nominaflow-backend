@@ -6,6 +6,7 @@ import {
     deleteCompany,
 } from '../controllers/companyController.js';
 import { protect } from '../middleware/authMiddleware.js';
+import { checkCompanyLimit } from '../middleware/checkSubscriptionLimit.js';
 import validate from '../middleware/validateMiddleware.js';
 import { createCompanySchema } from '../schemas/companySchemas.js';
 
@@ -17,7 +18,7 @@ router.use(protect);
 router
     .route('/')
     .get(getCompanies)
-    .post(validate(createCompanySchema), createCompany);
+    .post(validate(createCompanySchema), checkCompanyLimit, createCompany);
 
 router
     .route('/:id')
