@@ -10,6 +10,6 @@ router.route('/')
     .post(protect, checkReceiptLimit, createReceipt)
     .get(protect, getReceipts); // Snapshot generation logic
 
-router.get('/:id/pdf', downloadReceiptPDF);
+router.get('/:id/pdf', protect, downloadReceiptPDF);
 
 export default router;
