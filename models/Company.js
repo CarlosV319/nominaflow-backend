@@ -32,6 +32,17 @@ const companySchema = new mongoose.Schema({
     logoUrl: {
         type: String
     },
+    // ─── Nuevos campos Fase 1 (Normativa 2026) ──────────
+    tipoEmpleador: {
+        type: String,
+        enum: ['mipyme', 'gran_empresa_servicios'],
+        default: 'mipyme'   // MiPyME = alícuota patronal 18%, Gran Empresa = 20.40%
+    },
+    cct: {
+        type: String,
+        default: ''         // Convenio Colectivo de Trabajo (ej: '130/75', '260/75', '40/89')
+    },
+    // ─── Fin campos Fase 1 ──────────────────────────────
     active: {
         type: Boolean,
         default: true

@@ -2,6 +2,8 @@ import Receipt from '../models/Receipt.js';
 import Employee from '../models/Employee.js';
 import Company from '../models/Company.js';
 import AppError from '../utils/AppError.js';
+import { calculatePayroll, calculateSAC, calculateIndemnizacion, calculateVacaciones } from '../utils/calculationEngine.js';
+import { calcularRetencionGanancias, saveGananciasTracker } from '../utils/gananciasEngine.js';
 
 // @desc    Generar nuevo recibo de sueldo (Snapshot)
 // @route   POST /api/receipts
@@ -51,14 +53,23 @@ export const createReceipt = async (req, res) => {
     console.log('--- CREATING RECEIPT DEBUG ---');
     console.log('Employee:', employee.nombre);
 
-    // Extracción de datos extra del body (fechas pago/deposito)
-    const { fechaPago, fechaDeposito, bancoDeposito } = req.body;
+    const { 
+        fechaPago, 
+        fechaDeposito, 
+        bancoDeposito, 
+        tipoLiquidacion = 'mensual',
+        contribucionesPatronales = {
+            jubilacion: 0, obraSocial: 0, scvo: 0, artFijo: 0, detraccion: 0, total: 0
+        }
+    } = req.body;
 
     const receiptData = {
         user: req.user.id,
         company: company._id,
         employee: employee._id,
         periodo,
+        tipoLiquidacion,
+        contribucionesPatronales,
         fechaPago: fechaPago || new Date().toLocaleDateString('es-AR'), // Default hoy si no viene
         fechaDeposito: fechaDeposito || new Date().toLocaleDateString('es-AR'), // Default hoy si no viene
         bancoDeposito: bancoDeposito || employee.banco || '',
@@ -81,19 +92,29 @@ export const createReceipt = async (req, res) => {
         companySnapshot: {
             razonSocial: company.razonSocial,
             cuit: company.cuit,
-            domicilio: company.domicilio
+            domicilio: company.domicilio,
+            tipoEmpleador: company.tipoEmpleador, // Add tipoEmpleador to snapshot
+            cct: company.cct // Add cct to snapshot
         },
         items: processedItems,
         totales: {
             totalBruto,
             totalNeto,
-            totalDescuentos: totalDeducciones
+            totalDescuentos: totalDeducciones,
+            totalNoRemunerativo
         }
     };
     console.log('Receipt Data to Save:', JSON.stringify(receiptData, null, 2));
 
     try {
         const receipt = await Receipt.create(receiptData);
+        
+        // Guardar acumulado de ganancias si viene en el request
+        const { gananciasDetalle } = req.body;
+        if (gananciasDetalle) {
+            await saveGananciasTracker(req.user.id, company._id, employee._id, periodo.anio, gananciasDetalle);
+        }
+
         res.status(201).json({
             status: 'success',
             data: receipt
@@ -155,3 +176,125 @@ export const downloadReceiptPDF = async (req, res) => {
         throw new AppError(`Error generando el PDF: ${error.message}`, 500);
     }
 };
+
+// @desc    Pre-calcular ítems de liquidación mensual
+// @route   POST /api/receipts/calculate
+// @access  Private
+export const calculateReceipt = async (req, res) => {
+    const { employeeId, periodo, options } = req.body;
+
+    const employee = await Employee.findOne({ _id: employeeId, user: req.user.id });
+    if (!employee) throw new AppError('Empleado no encontrado', 404);
+
+    const company = await Company.findOne({ _id: employee.company, user: req.user.id });
+    if (!company) throw new AppError('Empresa asociada no encontrada', 404);
+
+    const result = calculatePayroll(employee, company, periodo, options);
+
+    if (options && options.calcularGanancias) {
+        const ganancias = await calcularRetencionGanancias(
+            employee,
+            periodo.anio,
+            periodo.mes,
+            result.totals.totalRemunerativo,
+            result.totals.totalDeducciones
+        );
+        
+        result.gananciasDetalle = ganancias;
+
+        if (ganancias.retencionDelMes > 0) {
+            result.items.push({
+                codigo: '8500',
+                concepto: 'Retención Imp. a las Ganancias',
+                unidades: 0,
+                tipo: 'deduccion',
+                monto: ganancias.retencionDelMes
+            });
+            result.totals.totalDeducciones += ganancias.retencionDelMes;
+            result.totals.totalDeducciones = Math.round(result.totals.totalDeducciones * 100) / 100;
+            result.totals.totalNeto = Math.round((result.totals.totalBruto - result.totals.totalDeducciones) * 100) / 100;
+        }
+    }
+
+    res.status(200).json({
+        status: 'success',
+        data: result
+    });
+};
+
+// @desc    Pre-calcular SAC
+// @route   POST /api/receipts/calculate-sac
+// @access  Private
+export const calculateSACReceipt = async (req, res) => {
+    const { employeeId, mejorRemuneracion, diasTrabajados, options } = req.body;
+
+    const employee = await Employee.findOne({ _id: employeeId, user: req.user.id });
+    if (!employee) throw new AppError('Empleado no encontrado', 404);
+
+    const company = await Company.findOne({ _id: employee.company, user: req.user.id });
+    if (!company) throw new AppError('Empresa asociada no encontrada', 404);
+
+    const result = calculateSAC(
+        mejorRemuneracion || employee.sueldoBruto,
+        diasTrabajados || 180,
+        company.tipoEmpleador,
+        options
+    );
+
+    res.status(200).json({
+        status: 'success',
+        data: result
+    });
+};
+
+// @desc    Pre-calcular Vacaciones
+// @route   POST /api/receipts/calculate-vacaciones
+// @access  Private
+export const calculateVacacionesReceipt = async (req, res) => {
+    const { employeeId, periodo, sueldoMensual, options } = req.body;
+
+    const employee = await Employee.findOne({ _id: employeeId, user: req.user.id });
+    if (!employee) throw new AppError('Empleado no encontrado', 404);
+
+    const company = await Company.findOne({ _id: employee.company, user: req.user.id });
+    if (!company) throw new AppError('Empresa asociada no encontrada', 404);
+
+    const ingreso = new Date(employee.fechaIngreso);
+    const fechaCalculo = new Date(periodo?.anio || new Date().getFullYear(), (periodo?.mes || new Date().getMonth() + 1), 0);
+    let antiguedad = fechaCalculo.getFullYear() - ingreso.getFullYear();
+    const m = fechaCalculo.getMonth() - ingreso.getMonth();
+    if (m < 0 || (m === 0 && fechaCalculo.getDate() < ingreso.getDate())) {
+        antiguedad--;
+    }
+    antiguedad = Math.max(0, antiguedad);
+
+    const result = calculateVacaciones(
+        sueldoMensual || employee.sueldoBruto,
+        antiguedad,
+        company.tipoEmpleador,
+        options
+    );
+
+    res.status(200).json({
+        status: 'success',
+        data: result
+    });
+};
+
+// @desc    Pre-calcular Liquidación Final
+// @route   POST /api/receipts/calculate-final
+// @access  Private
+export const calculateFinalReceipt = async (req, res) => {
+    const { employeeId, periodo, options } = req.body;
+
+    const employee = await Employee.findOne({ _id: employeeId, user: req.user.id });
+    if (!employee) throw new AppError('Empleado no encontrado', 404);
+
+    const result = calculateIndemnizacion(employee, periodo, options);
+
+    res.status(200).json({
+        status: 'success',
+        data: result
+    });
+};
+

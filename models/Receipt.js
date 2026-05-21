@@ -44,6 +44,21 @@ const receiptSchema = new mongoose.Schema({
         cuit: { type: String, required: true },
         domicilio: { type: String, required: true }
     },
+    // ─── Nuevos campos Fase 2 (Normativa 2026) ──────────
+    tipoLiquidacion: { 
+        type: String, 
+        enum: ['mensual', 'sac', 'vacaciones', 'final', 'sac_proporcional'],
+        default: 'mensual' 
+    },
+    contribucionesPatronales: {
+        jubilacion: { type: Number, default: 0 },
+        obraSocial: { type: Number, default: 0 },
+        scvo: { type: Number, default: 0 },
+        artFijo: { type: Number, default: 0 },
+        detraccion: { type: Number, default: 0 },
+        total: { type: Number, default: 0 }
+    },
+    // ─── Fin campos Fase 2 ──────────────────────────────
     items: [{
         codigo: { type: String, required: true },
         concepto: { type: String, required: true },
@@ -55,7 +70,8 @@ const receiptSchema = new mongoose.Schema({
     totales: {
         totalBruto: { type: Number, default: 0 },
         totalNeto: { type: Number, default: 0 },
-        totalDescuentos: { type: Number, default: 0 }
+        totalDescuentos: { type: Number, default: 0 },
+        totalNoRemunerativo: { type: Number, default: 0 } // Agregado en Fase 2
     }
 }, {
     timestamps: true

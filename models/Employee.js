@@ -70,7 +70,38 @@ const employeeSchema = new mongoose.Schema({
     categoria: {
         type: String,
         default: ''
+    },
+    // ─── Nuevos campos Fase 1 (Normativa 2026) ──────────
+    obraSocial: {
+        type: String,
+        default: ''         // Nombre de la obra social
+    },
+    sindicato: {
+        type: String,
+        default: ''         // Nombre del sindicato
+    },
+    cuotaSindical: {
+        type: Number,
+        default: 0,         // Porcentaje de cuota sindical (ej: 2, 2.5)
+        min: 0
+    },
+    estado: {
+        type: String,
+        enum: ['activo', 'licencia', 'baja'],
+        default: 'activo'
+    },
+    fechaBaja: {
+        type: Date
+    },
+    motivoBaja: {
+        type: String
+    },
+    cargasFamilia: {
+        conyuge: { type: Boolean, default: false },
+        hijos: { type: Number, default: 0, min: 0 },
+        hijosDiscapacitados: { type: Number, default: 0, min: 0 }
     }
+    // ─── Fin campos Fase 1 ──────────────────────────────
 }, {
     timestamps: true
 });
