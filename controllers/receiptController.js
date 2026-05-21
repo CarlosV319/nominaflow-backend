@@ -162,7 +162,7 @@ export const downloadReceiptPDF = async (req, res) => {
 
     try {
         const { generateReceiptPDF } = await import('../services/pdfService.js');
-        const pdfBuffer = await generateReceiptPDF(receipt);
+        const pdfBuffer = await generateReceiptPDF(receipt, req.user.plan);
 
         res.set({
             'Content-Type': 'application/pdf',

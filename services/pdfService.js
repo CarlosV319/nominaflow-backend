@@ -164,7 +164,7 @@ handlebars.registerHelper('numberToWords', function (value) {
 });
 
 
-export const generateReceiptPDF = async (receiptData) => {
+export const generateReceiptPDF = async (receiptData, userPlan) => {
     try {
         const __dirname = path.dirname(fileURLToPath(import.meta.url));
         const templatePath = path.join(__dirname, '../templates/receipt.hbs');
@@ -178,6 +178,9 @@ export const generateReceiptPDF = async (receiptData) => {
 
         const context = {
             company: receiptData.companySnapshot,
+            tipoLiquidacionLabel: receiptData.tipoLiquidacion === 'sac' ? 'S.A.C.' : 
+                                  receiptData.tipoLiquidacion === 'vacaciones' ? 'Vacaciones' : 
+                                  receiptData.tipoLiquidacion === 'final' ? 'Final' : 'Mensual',
             // Construimos objeto de empleado aplanado para fácil acceso
             employee: {
                 ...receiptData.employeeSnapshot,
@@ -231,7 +234,8 @@ export const generateReceiptPDF = async (receiptData) => {
                 descuentos: receiptData.totales.totalDescuentos,
                 noRemunerativo: receiptData.items.reduce((acc, item) => acc + (item.montoNoRemunerativo || 0), 0)
             },
-            isFinal: true
+            isFinal: true,
+            showWatermark: userPlan === 'INICIAL' || userPlan === 'FREE'
         };
 
         const html = template(context);
