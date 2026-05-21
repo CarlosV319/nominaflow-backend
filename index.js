@@ -15,12 +15,17 @@ import companyRoutes from './routes/company.routes.js';
 import employeeRoutes from './routes/employee.routes.js';
 import receiptRoutes from './routes/receipt.routes.js';
 import subscriptionRoutes from './routes/subscription.routes.js';
+import adminRoutes from './routes/admin.routes.js';
 
 import AppError from './utils/AppError.js';
+import { initSuperAdmin } from './utils/initSuperAdmin.js';
 
 dotenv.config();
 
-connectDB();
+connectDB().then(() => {
+    // Inicializar superadmin una vez que la DB esté conectada
+    initSuperAdmin();
+});
 
 const app = express();
 
@@ -67,6 +72,7 @@ app.use('/api/v1/companies', companyRoutes);
 app.use('/api/v1/employees', employeeRoutes);
 app.use('/api/v1/receipts', receiptRoutes);
 app.use('/api/v1/subscription', subscriptionRoutes);
+app.use('/api/v1/admin', adminRoutes);
 
 // Basic Root Route
 app.get('/', (req, res) => {
