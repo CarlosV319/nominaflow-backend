@@ -43,6 +43,22 @@ const companySchema = new mongoose.Schema({
         default: ''         // Convenio Colectivo de Trabajo (ej: '130/75', '260/75', '40/89')
     },
     // ─── Fin campos Fase 1 ──────────────────────────────
+    conceptosPersonalizados: [
+        {
+            codigo: { type: String, required: true },
+            concepto: { type: String, required: true },
+            tipoCalculo: {
+                type: String,
+                enum: ['unidades', 'porcentaje'],
+                default: 'unidades'
+            },
+            tipoConcepto: {
+                type: String,
+                enum: ['remunerativo', 'no_remunerativo', 'deduccion'],
+                required: true
+            }
+        }
+    ],
     active: {
         type: Boolean,
         default: true
