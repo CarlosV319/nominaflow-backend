@@ -108,13 +108,17 @@ export const calcularAportesTrabajador = (brutoRemunerativo, options = {}) => {
         monto: Math.round(baseCalculo * APORTES_TRABAJADOR.PAMI.alicuota * 100) / 100,
     });
 
-    // Obra Social
+    // Obra Social (se calcula sobre el sueldo completo o total remunerativo, el mayor de ambos, según art. 92 ter LCT)
+    const baseObraSocial = options.brutoCompleto 
+        ? Math.max(baseCalculo, Math.min(options.brutoCompleto, topeMax))
+        : baseCalculo;
+
     items.push({
         codigo: APORTES_TRABAJADOR.OBRA_SOCIAL.codigo,
         concepto: APORTES_TRABAJADOR.OBRA_SOCIAL.concepto,
         unidades: APORTES_TRABAJADOR.OBRA_SOCIAL.alicuota * 100, // 3
         tipo: 'deduccion',
-        monto: Math.round(baseCalculo * APORTES_TRABAJADOR.OBRA_SOCIAL.alicuota * 100) / 100,
+        monto: Math.round(baseObraSocial * APORTES_TRABAJADOR.OBRA_SOCIAL.alicuota * 100) / 100,
     });
 
     // Cuota sindical (si aplica)
@@ -215,23 +219,25 @@ export const calculatePayroll = (employee, company, periodo, options = {}) => {
 
     // ─── HABERES REMUNERATIVOS ──────────────────────────
 
-    // 1. Sueldo Básico
+    // 1. Sueldo Básico (Proporcional a días trabajados)
+    const sueldoProporcional = Math.round((bruto / 30) * diasTrabajados * 100) / 100;
+
     items.push({
         codigo: '1000',
         concepto: 'Sueldo Básico',
         unidades: diasTrabajados,
         tipo: 'remunerativo',
-        monto: bruto,
+        monto: sueldoProporcional,
     });
 
     // 2. Antigüedad (si aplica y tiene años)
     if (incluirAntiguedad && antiguedad > 0) {
         const cctData = company.cct ? CCT[company.cct] : null;
-        let baseAntiguedad = bruto;
+        let baseAntiguedad = sueldoProporcional;
 
         // Camioneros: antigüedad sobre total remunerativo
         if (cctData && cctData.antiguedadSobreTotal) {
-            baseAntiguedad = bruto; // Se recalculará después si hay más haberes
+            baseAntiguedad = sueldoProporcional; // Se recalculará después si hay más haberes
         }
 
         const porcentajeAnt = cctData?.antiguedad || 0.01; // Default 1% por año
@@ -294,12 +300,27 @@ export const calculatePayroll = (employee, company, periodo, options = {}) => {
         });
     }
 
+    // Feriados (Pago Completo del Día Feriado)
+    const diasFeriados = options.diasFeriados || 0;
+    if (diasFeriados > 0) {
+        const valorDiaFeriado = bruto / 25;
+        const totalFeriados = Math.round(valorDiaFeriado * diasFeriados * 100) / 100;
+        
+        items.push({
+            codigo: '3050',
+            concepto: 'Feriados Nacionales',
+            unidades: diasFeriados,
+            tipo: 'remunerativo',
+            monto: totalFeriados,
+        });
+    }
+
     // 5. Fórmulas Dinámicas (Configuradas desde Admin SaaS)
     if (options.formulas && Array.isArray(options.formulas)) {
         const scope = {
             salario_base: bruto,
             dias_trabajados: diasTrabajados,
-            dias_feriados: options.diasFeriados || 0,
+            dias_feriados: diasFeriados,
             horas_extras_50: horasExtra50,
             horas_extras_100: horasExtra100,
             antiguedad: antiguedad
@@ -315,8 +336,8 @@ export const calculatePayroll = (employee, company, periodo, options = {}) => {
                     items.push({
                         codigo: `DYN${index + 1}`,
                         concepto: formula.name,
-                        unidades: 0, // Las unidades podrían venir de variables, lo dejamos en 0 por defecto
-                        tipo: formula.type.toLowerCase().includes('deducc') ? 'deduccion' : 'remunerativo', // O 'no_remunerativo'
+                        unidades: 0,
+                        tipo: formula.type.toLowerCase().includes('deducc') ? 'deduccion' : 'remunerativo',
                         monto: Math.abs(montoFormula),
                     });
                 }
@@ -338,9 +359,14 @@ export const calculatePayroll = (employee, company, periodo, options = {}) => {
     // ─── DEDUCCIONES (APORTES DEL TRABAJADOR) ───────────
     const deduccionItems = calcularAportesTrabajador(totalRemunerativo, {
         cuotaSindicalPorcentaje: employee.cuotaSindical || 0,
+        brutoCompleto: bruto
     });
 
     items.push(...deduccionItems);
+
+    // Organizar ítems por tipo (Remunerativo -> No Remunerativo -> Deducciones)
+    const typeOrder = { 'remunerativo': 1, 'no_remunerativo': 2, 'deduccion': 3 };
+    items.sort((a, b) => (typeOrder[a.tipo] || 99) - (typeOrder[b.tipo] || 99));
 
     // ─── TOTALES ────────────────────────────────────────
     const totalDeducciones = deduccionItems.reduce((acc, i) => acc + i.monto, 0);
