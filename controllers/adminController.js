@@ -61,9 +61,14 @@ export const updateUser = async (req, res, next) => {
         if (firstName) user.firstName = firstName;
         if (lastName) user.lastName = lastName;
         if (email) user.email = email;
-        if (role) user.role = role;
+        if (role) user.role = role === 'user' ? 'ADMIN' : role;
         if (plan) user.plan = plan;
         if (subscriptionStatus) user.subscriptionStatus = subscriptionStatus;
+
+        // Hotfix for legacy users
+        if (!user.firstName) user.firstName = 'Usuario';
+        if (!user.lastName) user.lastName = 'Registrado';
+        if (user.role === 'user') user.role = 'ADMIN';
 
         const updatedUser = await user.save();
 
@@ -107,6 +112,108 @@ export const deleteUser = async (req, res, next) => {
             status: 'success',
             data: null
         });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @desc    Get SaaS Analytics
+// @route   GET /api/v1/admin/analytics
+// @access  Private/SUPERADMIN
+export const getAnalytics = async (req, res, next) => {
+    try {
+        const sixMonthsAgo = new Date();
+        sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 5);
+        sixMonthsAgo.setDate(1);
+        sixMonthsAgo.setHours(0, 0, 0, 0);
+
+        // Agregación de usuarios por mes
+        const usersByMonth = await User.aggregate([
+            { $match: { createdAt: { $gte: sixMonthsAgo } } },
+            {
+                $group: {
+                    _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } },
+                    count: { $sum: 1 }
+                }
+            },
+            { $sort: { _id: 1 } }
+        ]);
+
+        // Agregación de recibos por mes
+        const receiptsByMonth = await Receipt.aggregate([
+            { $match: { createdAt: { $gte: sixMonthsAgo } } },
+            {
+                $group: {
+                    _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } },
+                    count: { $sum: 1 }
+                }
+            },
+            { $sort: { _id: 1 } }
+        ]);
+
+        // Agregación de empleados por mes
+        const employeesByMonth = await Employee.aggregate([
+            { $match: { createdAt: { $gte: sixMonthsAgo } } },
+            {
+                $group: {
+                    _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } },
+                    count: { $sum: 1 }
+                }
+            },
+            { $sort: { _id: 1 } }
+        ]);
+
+        // Totales históricos
+        const totalUsers = await User.countDocuments();
+        const totalReceipts = await Receipt.countDocuments();
+        const totalEmployees = await Employee.countDocuments();
+        const totalCompanies = await Company.countDocuments();
+
+        // Formatear para el frontend (asegurarse de tener meses continuos)
+        const formatData = (agg) => {
+            const data = {};
+            agg.forEach(item => {
+                data[item._id] = item.count;
+            });
+            return data;
+        };
+
+        const uData = formatData(usersByMonth);
+        const rData = formatData(receiptsByMonth);
+        const eData = formatData(employeesByMonth);
+
+        // Generar array de últimos 6 meses para gráfica combinada
+        const chartData = [];
+        for (let i = 0; i < 6; i++) {
+            const d = new Date();
+            d.setMonth(d.getMonth() - (5 - i));
+            const monthStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+            
+            // Mes en formato corto (ej: "May")
+            const monthLabel = d.toLocaleString('es-ES', { month: 'short' }).substring(0, 3).toUpperCase();
+
+            chartData.push({
+                name: monthLabel,
+                sortKey: monthStr,
+                usuarios: uData[monthStr] || 0,
+                recibos: rData[monthStr] || 0,
+                empleados: eData[monthStr] || 0
+            });
+        }
+
+        res.status(200).json({
+            status: 'success',
+            data: {
+                totals: {
+                    users: totalUsers,
+                    receipts: totalReceipts,
+                    employees: totalEmployees,
+                    companies: totalCompanies
+                },
+                chartData
+            }
+        });
+
     } catch (error) {
         next(error);
     }

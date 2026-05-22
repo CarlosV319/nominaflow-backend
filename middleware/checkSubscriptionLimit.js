@@ -6,10 +6,10 @@ import AppError from '../utils/AppError.js';
 // 1. Configuración de Límites
 // 1. Configuración de Límites
 const PLAN_LIMITS = {
-    INICIAL: { companies: 1, receipts: 5 },
-    PROFESIONAL: { companies: 10, receipts: 50 },
-    ESTUDIO: { companies: 50, receipts: 500 },
-    CORPORATE: { companies: Infinity, receipts: 2000 }
+    INICIAL: { companies: 1, receipts: 5, canExportTxt: false },
+    PROFESIONAL: { companies: 10, receipts: 50, canExportTxt: true },
+    ESTUDIO: { companies: 50, receipts: 500, canExportTxt: true },
+    CORPORATE: { companies: Infinity, receipts: 2000, canExportTxt: true }
 };
 
 // Helper para obtener límites según el usuario
@@ -67,6 +67,24 @@ export const checkReceiptLimit = async (req, res, next) => {
         if (count >= limits.receipts) {
             return next(new AppError(
                 `Has alcanzado el límite de ${limits.receipts} recibos este mes para tu plan ${plan}. Actualiza tu plan para continuar.`,
+                403
+            ));
+        }
+
+        next();
+    } catch (error) {
+        next(error);
+    }
+};
+
+// 4. Middleware para Limite de Exportación TXT
+export const checkTxtExportFeature = async (req, res, next) => {
+    try {
+        const { plan, limits } = await getLimits(req.user.id);
+
+        if (!limits.canExportTxt) {
+            return next(new AppError(
+                `Tu plan actual (${plan}) no incluye la funcionalidad de exportación a Libro de Sueldos Digital (TXT). Actualiza tu plan para desbloquear esta característica.`,
                 403
             ));
         }
