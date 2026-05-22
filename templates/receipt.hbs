@@ -311,6 +311,16 @@
                             </div>
                         </div>
 
+                        <!-- Transparencia Costo Laboral -->
+                        <div class="px-2 border-b border-slate-300 bg-[#FFF8F0] text-[7px] py-1 flex justify-between items-center text-slate-700">
+                            <span class="font-bold uppercase text-[#E85D04]">Costo Laboral Empleador (Dec 847/24)</span>
+                            <div class="flex gap-4">
+                                <span>Aportes Retenidos: <span class="font-mono">{{fmtCurrency totals.descuentos}}</span></span>
+                                <span>Contrib. Patronales: <span class="font-mono">{{fmtCurrency contribucionesPatronales}}</span></span>
+                                <span class="font-bold">Costo Total Empresa: <span class="font-mono">{{fmtCurrency costoLaboralTotal}}</span></span>
+                            </div>
+                        </div>
+
                         <!-- Legal Text -->
                         <div class="px-2 py-1 border-b border-slate-300 bg-white">
                             <p class="text-[6px] text-slate-400 text-justify leading-tight">
@@ -560,6 +570,16 @@
                             <div class="col-span-4 px-2 py-1 flex items-center justify-end">
                                 <span class="font-bold uppercase text-slate-500 mr-2">Fecha Pago:</span>
                                 <span class="font-bold text-slate-800">{{fechaPago}}</span>
+                            </div>
+                        </div>
+
+                        <!-- Transparencia Costo Laboral -->
+                        <div class="px-2 border-b border-slate-300 bg-[#FFF8F0] text-[7px] py-1 flex justify-between items-center text-slate-700">
+                            <span class="font-bold uppercase text-[#E85D04]">Costo Laboral Empleador (Dec 847/24)</span>
+                            <div class="flex gap-4">
+                                <span>Aportes Retenidos: <span class="font-mono">{{fmtCurrency totals.descuentos}}</span></span>
+                                <span>Contrib. Patronales: <span class="font-mono">{{fmtCurrency contribucionesPatronales}}</span></span>
+                                <span class="font-bold">Costo Total Empresa: <span class="font-mono">{{fmtCurrency costoLaboralTotal}}</span></span>
                             </div>
                         </div>
 

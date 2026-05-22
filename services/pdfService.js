@@ -234,6 +234,8 @@ export const generateReceiptPDF = async (receiptData, userPlan) => {
                 descuentos: receiptData.totales.totalDescuentos,
                 noRemunerativo: receiptData.items.reduce((acc, item) => acc + (item.montoNoRemunerativo || 0), 0)
             },
+            contribucionesPatronales: receiptData.contribucionesPatronales?.total || 0,
+            costoLaboralTotal: (receiptData.totales.totalBruto || 0) + (receiptData.contribucionesPatronales?.total || 0),
             isFinal: true,
             showWatermark: userPlan === 'INICIAL' || userPlan === 'FREE'
         };
