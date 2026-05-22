@@ -177,6 +177,8 @@ export const downloadReceiptPDF = async (req, res) => {
     }
 };
 
+import Formula from '../models/Formula.js';
+
 // @desc    Pre-calcular ítems de liquidación mensual
 // @route   POST /api/receipts/calculate
 // @access  Private
@@ -189,7 +191,18 @@ export const calculateReceipt = async (req, res) => {
     const company = await Company.findOne({ _id: employee.company, user: req.user.id });
     if (!company) throw new AppError('Empresa asociada no encontrada', 404);
 
-    const result = calculatePayroll(employee, company, periodo, options);
+    // Obtener las fórmulas activas globales y del tenant
+    const formulas = await Formula.find({
+        isActive: true,
+        $or: [{ isGlobal: true }, { tenantId: company._id }]
+    });
+
+    const calculationOptions = {
+        ...options,
+        formulas
+    };
+
+    const result = calculatePayroll(employee, company, periodo, calculationOptions);
 
     if (options && options.calcularGanancias) {
         const ganancias = await calcularRetencionGanancias(

@@ -6,6 +6,7 @@
  * de un recibo de sueldo argentino conforme a la legislación vigente.
  * ============================================================
  */
+import { evaluate } from 'mathjs';
 
 import {
     APORTES_TRABAJADOR,
@@ -290,6 +291,38 @@ export const calculatePayroll = (employee, company, periodo, options = {}) => {
             unidades: horasExtra100,
             tipo: 'remunerativo',
             monto: montoHE100,
+        });
+    }
+
+    // 5. Fórmulas Dinámicas (Configuradas desde Admin SaaS)
+    if (options.formulas && Array.isArray(options.formulas)) {
+        const scope = {
+            salario_base: bruto,
+            dias_trabajados: diasTrabajados,
+            dias_feriados: options.diasFeriados || 0,
+            horas_extras_50: horasExtra50,
+            horas_extras_100: horasExtra100,
+            antiguedad: antiguedad
+        };
+
+        options.formulas.forEach((formula, index) => {
+            if (!formula.isActive) return;
+            try {
+                const result = evaluate(formula.expression, scope);
+                const montoFormula = Math.round(result * 100) / 100;
+                
+                if (montoFormula !== 0) {
+                    items.push({
+                        codigo: `DYN${index + 1}`,
+                        concepto: formula.name,
+                        unidades: 0, // Las unidades podrían venir de variables, lo dejamos en 0 por defecto
+                        tipo: formula.type.toLowerCase().includes('deducc') ? 'deduccion' : 'remunerativo', // O 'no_remunerativo'
+                        monto: Math.abs(montoFormula),
+                    });
+                }
+            } catch (error) {
+                console.error(`Error al evaluar la fórmula ${formula.name}:`, error.message);
+            }
         });
     }
 

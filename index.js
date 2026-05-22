@@ -17,6 +17,7 @@ import receiptRoutes from './routes/receipt.routes.js';
 import subscriptionRoutes from './routes/subscription.routes.js';
 import adminRoutes from './routes/admin.routes.js';
 import lsdRoutes from './routes/lsd.routes.js';
+import formulaRoutes from './routes/formulas.routes.js';
 
 import AppError from './utils/AppError.js';
 import { initSuperAdmin } from './utils/initSuperAdmin.js';
@@ -75,6 +76,7 @@ app.use('/api/v1/receipts', receiptRoutes);
 app.use('/api/v1/subscription', subscriptionRoutes);
 app.use('/api/v1/admin', adminRoutes);
 app.use('/api/v1/lsd', lsdRoutes);
+app.use('/api/v1/formulas', formulaRoutes);
 
 // Basic Root Route
 app.get('/', (req, res) => {
