@@ -6,7 +6,9 @@ export const checkCompanyOwnership = async (req, res, next) => {
     // Asume que el ID de la empresa viene en params (:companyId) o en body
     const companyId = req.params.companyId || req.params.id || req.body.companyId;
 
-    if (!companyId) return next(); // Si no hay ID, deja pasar (validación la hará el controller o validator)
+    if (!companyId) {
+        throw new AppError('Falta el identificador de la empresa en la solicitud', 400);
+    }
 
     const company = await Company.findById(companyId);
 

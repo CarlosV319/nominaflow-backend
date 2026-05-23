@@ -55,7 +55,7 @@ app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 app.use(cookieParser());
 
 // Data sanitization against NoSQL query injection
-// app.use(mongoSanitize());
+app.use(mongoSanitize());
 
 // CORS Policy
 app.use(cors({
@@ -68,8 +68,15 @@ app.use(cors({
     credentials: true,
 }));
 
+// Auth specific rate limiter
+const authLimiter = rateLimit({
+    max: 10,
+    windowMs: 15 * 60 * 1000,
+    message: 'Demasiados intentos de inicio de sesión desde esta IP, intente de nuevo en 15 minutos.'
+});
+
 // --- Routes Mounting ---
-app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/auth', authLimiter, authRoutes);
 app.use('/api/v1/companies', companyRoutes);
 app.use('/api/v1/employees', employeeRoutes);
 app.use('/api/v1/receipts', receiptRoutes);

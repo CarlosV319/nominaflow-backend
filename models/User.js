@@ -29,6 +29,7 @@ const userSchema = new mongoose.Schema({
         minlength: 6,
         select: false
     },
+    passwordChangedAt: Date,
     role: {
         type: String,
         enum: ['ADMIN', 'ACCOUNTANT', 'SUPERADMIN'],
@@ -60,6 +61,16 @@ userSchema.pre('save', async function () {
 // Método para comparar contraseñas
 userSchema.methods.matchPassword = async function (enteredPassword) {
     return await bcrypt.compare(enteredPassword, this.password);
+};
+
+// Verificar si el usuario cambió la contraseña después de emitir el token JWT
+userSchema.methods.changedPasswordAfter = function(JWTTimestamp) {
+    if (this.passwordChangedAt) {
+        const changedTimestamp = parseInt(this.passwordChangedAt.getTime() / 1000, 10);
+        return JWTTimestamp < changedTimestamp;
+    }
+    // Si no cambió la contraseña, devuelve falso
+    return false;
 };
 
 const User = mongoose.model('User', userSchema);

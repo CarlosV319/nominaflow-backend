@@ -29,10 +29,9 @@ export const protect = async (req, res, next) => {
     }
 
     // 4) Verificar si el usuario cambió la contraseña después de emitir el token
-    // (Opcional: implementar campo passwordChangedAt en modelo User si se requiere esta seguridad extra)
-    // if (currentUser.changedPasswordAfter(decoded.iat)) {
-    //   throw new AppError('Usuario cambió contraseña recientemente. Por favor logueate de nuevo.', 401);
-    // }
+    if (currentUser.changedPasswordAfter(decoded.iat)) {
+      throw new AppError('Usuario cambió su contraseña recientemente. Por favor, inicie sesión de nuevo.', 401);
+    }
 
     // RANT: Inyectar usuario en la request
     req.user = currentUser;
