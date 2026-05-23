@@ -235,6 +235,8 @@ export const generateReceiptPDF = async (receiptData, userPlan) => {
                 noRemunerativo: receiptData.items.reduce((acc, item) => acc + (item.montoNoRemunerativo || 0), 0)
             },
             contribucionesPatronales: receiptData.contribucionesPatronales?.total || 0,
+            reduccionFAL: receiptData.contribucionesPatronales?.reduccionFAL || 0,
+            falDetalle: receiptData.falDetalle || null,
             costoLaboralTotal: (receiptData.totales.totalBruto || 0) + (receiptData.contribucionesPatronales?.total || 0),
             ultimoAporteJubilatorio: receiptData.ultimoAporteJubilatorio || { periodo: '-', fecha: '-', banco: '-' },
             firmaTrabajador: receiptData.firmaTrabajador || false,

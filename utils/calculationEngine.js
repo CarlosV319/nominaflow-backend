@@ -179,7 +179,15 @@ export const calcularContribucionesPatronales = (brutoRemunerativo, tipoEmpleado
         ? Math.round(brutoRemunerativo * (artVariable / 100) * 100) / 100
         : 0;
 
-    const total = Math.round((jubilacionPatronal + obraSocialPatronal + scvo + artFijo + artVariableMonto) * 100) / 100;
+    // Reducción por aporte al FAL
+    const { falActivo = false } = options;
+    let reduccionFAL = 0;
+    if (falActivo) {
+        const tasaFAL = tipoEmpleador === 'mipyme' ? 0.025 : 0.01;
+        reduccionFAL = Math.round(brutoRemunerativo * tasaFAL * 100) / 100;
+    }
+
+    const total = Math.round((jubilacionPatronal + obraSocialPatronal + scvo + artFijo + artVariableMonto - reduccionFAL) * 100) / 100;
 
     return {
         jubilacion: jubilacionPatronal,
@@ -190,6 +198,7 @@ export const calcularContribucionesPatronales = (brutoRemunerativo, tipoEmpleado
         detraccion,
         baseContribucion: baseContribucionSS,
         alicuotaUsada: alicuota,
+        reduccionFAL, // Beneficio por aportar al FAL
         total,
     };
 };
@@ -376,7 +385,8 @@ export const calculatePayroll = (employee, company, periodo, options = {}) => {
     // ─── CONTRIBUCIONES PATRONALES ──────────────────────
     const contribucionesPatronales = calcularContribucionesPatronales(
         totalRemunerativo,
-        company.tipoEmpleador || 'mipyme'
+        company.tipoEmpleador || 'mipyme',
+        { falActivo: !!company.falAdhesionDate }
     );
 
     return {
@@ -433,7 +443,7 @@ export const calculateSAC = (mejorRemuneracion, diasTrabajados = 180, tipoEmplea
     const contribucionesPatronales = calcularContribucionesPatronales(
         sacBruto,
         tipoEmpleador,
-        { esSAC: true }
+        { esSAC: true, falActivo: options.falActivo || false }
     );
 
     return {
@@ -481,7 +491,8 @@ export const calculateVacaciones = (sueldoMensual, antiguedadAnios, tipoEmpleado
 
     const contribucionesPatronales = calcularContribucionesPatronales(
         montoVacaciones,
-        tipoEmpleador
+        tipoEmpleador,
+        { falActivo: options.falActivo || false }
     );
 
     return {
@@ -527,7 +538,7 @@ export const calculateHorasExtra = (sueldoMensual, cantidad, tipo = '50') => {
  * @param {object} options - { topeConvencional, diasTrabjadosMes, sueldoMesDespido }
  * @returns {object} Desglose completo de liquidación final
  */
-export const calculateIndemnizacion = (employee, periodo, options = {}) => {
+export const calculateIndemnizacion = (employee, company, periodo, options = {}) => {
     const { topeConvencional, diasTrabajadosMes = 30 } = options;
 
     const mejorRemun = employee.mejorRemuneracion || employee.sueldoBruto;
@@ -548,7 +559,6 @@ export const calculateIndemnizacion = (employee, periodo, options = {}) => {
     }
 
     // ─── Antigüedad para indemnización ──────────────
-    // 1 mes por año o fracción > 3 meses
     let aniosIndemnizacion = antiguedad;
     const fechaIngreso = new Date(employee.fechaIngreso);
     const fechaDespido = new Date(periodo.anio, periodo.mes - 1, diasTrabajadosMes);
@@ -560,6 +570,35 @@ export const calculateIndemnizacion = (employee, periodo, options = {}) => {
 
     // ─── Indemnización por antigüedad ───────────────
     const indemnizacionAntiguedad = Math.round(baseCalculo * aniosIndemnizacion * 100) / 100;
+
+    // ─── Módulo FAL (Fondo de Asistencia Laboral) ───
+    let saldoFAL = 0;
+    let aplicaFAL = false;
+    let mesesAportados = 0;
+    
+    if (company && company.falAdhesionDate) {
+        const fechaAdhesion = new Date(company.falAdhesionDate);
+        const mesesAdhesionEmpresa = (fechaDespido.getFullYear() - fechaAdhesion.getFullYear()) * 12 + (fechaDespido.getMonth() - fechaAdhesion.getMonth());
+        
+        // Carencia Empresa: 6 meses, Carencia Empleado: 12 meses
+        if (mesesAdhesionEmpresa >= 6 && antiguedad >= 1) {
+            aplicaFAL = true;
+            
+            // Inicio de aportes: el más reciente entre el ingreso del empleado y la adhesión de la empresa
+            const inicioAportes = fechaIngreso > fechaAdhesion ? fechaIngreso : fechaAdhesion;
+            mesesAportados = (fechaDespido.getFullYear() - inicioAportes.getFullYear()) * 12 + (fechaDespido.getMonth() - inicioAportes.getMonth());
+            
+            if (mesesAportados > 0) {
+                const tasaFAL = company.tipoEmpleador === 'mipyme' ? 0.025 : 0.01;
+                // Saldo estimado: meses aportados * (remuneración base SIPA aprox * tasa)
+                saldoFAL = Math.round(mesesAportados * (mejorRemun * tasaFAL) * 100) / 100;
+            }
+        }
+    }
+    
+    // El FAL cubre la Indemnización por Antigüedad (Art 245) hasta el límite de su saldo
+    const coberturaFAL = Math.min(saldoFAL, indemnizacionAntiguedad);
+    const diferenciaEmpleadorArt245 = indemnizacionAntiguedad - coberturaFAL;
 
     // ─── Preaviso ───────────────────────────────────
     const mesesPreaviso = antiguedad > 5
@@ -580,7 +619,6 @@ export const calculateIndemnizacion = (employee, periodo, options = {}) => {
     const vacacionesNoGozadas = Math.round(valorDiarioVac * diasProporcionales * 100) / 100;
 
     // ─── SAC proporcional ───────────────────────────
-    // Sobre: preaviso + integración + vacaciones no gozadas
     const baseSACProp = indemnizacionPreaviso + integracionMes + vacacionesNoGozadas;
     const sacProporcional = Math.round(baseSACProp * INDEMNIZACION.SAC_PROPORCIONAL * 100) / 100;
 
@@ -613,7 +651,14 @@ export const calculateIndemnizacion = (employee, periodo, options = {}) => {
             sueldoProporcional: { concepto: 'Sueldo Proporcional (Días Trabajados)', monto: sueldoProporcional, detalle: `${diasTrabajadosMes} día(s)` },
             sacSemestre: { concepto: 'SAC Proporcional del Semestre', monto: sacSemestre, detalle: `${mesesEnSemestre} mes(es)` },
         },
+        fal: aplicaFAL ? {
+            saldoEstimado: saldoFAL,
+            coberturaFAL: coberturaFAL,
+            diferenciaEmpleadorArt245: diferenciaEmpleadorArt245,
+            mesesAportados: mesesAportados
+        } : null,
         total: totalFinal,
+        totalACargoEmpleador: totalFinal - coberturaFAL,
         antiguedad,
         baseCalculo,
         pisoVizzotiAplicado: baseCalculo === pisoVizzoti,

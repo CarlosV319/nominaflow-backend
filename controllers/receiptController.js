@@ -311,7 +311,7 @@ export const calculateSACReceipt = async (req, res) => {
         mejorRemuneracion || employee.sueldoBruto,
         diasTrabajados || 180,
         company.tipoEmpleador,
-        options
+        { ...options, falActivo: !!company.falAdhesionDate }
     );
 
     res.status(200).json({
@@ -345,7 +345,7 @@ export const calculateVacacionesReceipt = async (req, res) => {
         sueldoMensual || employee.sueldoBruto,
         antiguedad,
         company.tipoEmpleador,
-        options
+        { ...options, falActivo: !!company.falAdhesionDate }
     );
 
     res.status(200).json({
@@ -363,7 +363,10 @@ export const calculateFinalReceipt = async (req, res) => {
     const employee = await Employee.findOne({ _id: employeeId, user: req.user.id });
     if (!employee) throw new AppError('Empleado no encontrado', 404);
 
-    const result = calculateIndemnizacion(employee, periodo, options);
+    const company = await Company.findOne({ _id: employee.company, user: req.user.id });
+    if (!company) throw new AppError('Empresa asociada no encontrada', 404);
+
+    const result = calculateIndemnizacion(employee, company, periodo, options);
 
     res.status(200).json({
         status: 'success',

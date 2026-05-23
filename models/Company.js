@@ -42,6 +42,9 @@ const companySchema = new mongoose.Schema({
         type: String,
         default: ''         // Convenio Colectivo de Trabajo (ej: '130/75', '260/75', '40/89')
     },
+    falAdhesionDate: {
+        type: Date          // Fecha en la que la empresa se adhirió al Fondo de Asistencia Laboral (FAL)
+    },
     // ─── Fin campos Fase 1 ──────────────────────────────
     conceptosPersonalizados: [
         {

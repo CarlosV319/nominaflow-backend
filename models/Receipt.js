@@ -56,6 +56,7 @@ const receiptSchema = new mongoose.Schema({
         scvo: { type: Number, default: 0 },
         artFijo: { type: Number, default: 0 },
         detraccion: { type: Number, default: 0 },
+        reduccionFAL: { type: Number, default: 0 },
         total: { type: Number, default: 0 }
     },
     ultimoAporteJubilatorio: {
@@ -63,7 +64,13 @@ const receiptSchema = new mongoose.Schema({
         fecha: String,
         banco: String
     },
-    // ─── Fin campos Fase 2 ──────────────────────────────
+    falDetalle: {
+        saldoEstimado: { type: Number, default: 0 },
+        coberturaFAL: { type: Number, default: 0 },
+        diferenciaEmpleadorArt245: { type: Number, default: 0 },
+        mesesAportados: { type: Number, default: 0 }
+    },
+    // ─── Fin campos Fase 2 y 3 ───────────────────────────
     items: [{
         codigo: { type: String, required: true },
         concepto: { type: String, required: true },
