@@ -6,7 +6,8 @@ import {
     calculateReceipt,
     calculateSACReceipt,
     calculateVacacionesReceipt,
-    calculateFinalReceipt
+    calculateFinalReceipt,
+    signReceipt
 } from '../controllers/receiptController.js';
 import { protect } from '../middleware/authMiddleware.js';
 import { checkReceiptLimit } from '../middleware/checkSubscriptionLimit.js';
@@ -25,5 +26,6 @@ router.route('/')
     .get(protect, getReceipts); // Snapshot generation logic
 
 router.get('/:id/pdf', protect, downloadReceiptPDF);
+router.post('/:id/sign', protect, signReceipt);
 
 export default router;

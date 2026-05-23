@@ -36,6 +36,17 @@ const app = express();
 // Set Security HTTP Headers
 app.use(helmet());
 
+// CORS Policy (debe ir antes que el rate limit y el body parser para manejar preflights OPTIONS correctamente)
+app.use(cors({
+    origin: [
+        'http://localhost:5173',
+        /^https:\/\/nomina-flow-.*\.vercel\.app$/, // Permite cualquier preview de Vercel
+        'https://nomina-flow.vercel.app',
+        process.env.CLIENT_URL
+    ].filter(Boolean),
+    credentials: true,
+}));
+
 // Development logging
 if (process.env.NODE_ENV === 'development') {
     app.use(morgan('dev'));
@@ -55,18 +66,10 @@ app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 app.use(cookieParser());
 
 // Data sanitization against NoSQL query injection
-app.use(mongoSanitize());
+// Nota: express-mongo-sanitize no es compatible nativamente con Express 5.x porque req.query es solo lectura (getter).
+// app.use(mongoSanitize());
 
-// CORS Policy
-app.use(cors({
-    origin: [
-        'http://localhost:5173',
-        /^https:\/\/nomina-flow-.*\.vercel\.app$/, // Permite cualquier preview de Vercel
-        'https://nomina-flow.vercel.app',
-        process.env.CLIENT_URL
-    ].filter(Boolean),
-    credentials: true,
-}));
+
 
 // Auth specific rate limiter
 const authLimiter = rateLimit({

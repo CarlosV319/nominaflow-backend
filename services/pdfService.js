@@ -236,6 +236,10 @@ export const generateReceiptPDF = async (receiptData, userPlan) => {
             },
             contribucionesPatronales: receiptData.contribucionesPatronales?.total || 0,
             costoLaboralTotal: (receiptData.totales.totalBruto || 0) + (receiptData.contribucionesPatronales?.total || 0),
+            ultimoAporteJubilatorio: receiptData.ultimoAporteJubilatorio || { periodo: '-', fecha: '-', banco: '-' },
+            firmaTrabajador: receiptData.firmaTrabajador || false,
+            signedInDisagreement: receiptData.signedInDisagreement || false,
+            disagreementComment: receiptData.disagreementComment || '',
             isFinal: true,
             showWatermark: userPlan === 'INICIAL' || userPlan === 'FREE'
         };

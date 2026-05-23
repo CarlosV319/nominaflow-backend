@@ -58,6 +58,11 @@ const receiptSchema = new mongoose.Schema({
         detraccion: { type: Number, default: 0 },
         total: { type: Number, default: 0 }
     },
+    ultimoAporteJubilatorio: {
+        periodo: String,
+        fecha: String,
+        banco: String
+    },
     // ─── Fin campos Fase 2 ──────────────────────────────
     items: [{
         codigo: { type: String, required: true },
@@ -72,7 +77,12 @@ const receiptSchema = new mongoose.Schema({
         totalNeto: { type: Number, default: 0 },
         totalDescuentos: { type: Number, default: 0 },
         totalNoRemunerativo: { type: Number, default: 0 } // Agregado en Fase 2
-    }
+    },
+    // ─── Campos Portal Empleado y Firma Legal ────────────
+    firmaTrabajador: { type: Boolean, default: false },
+    signedInDisagreement: { type: Boolean, default: false },
+    disagreementComment: { type: String },
+    pdfPath: { type: String } // Local storage path for generated PDF
 }, {
     timestamps: true
 });

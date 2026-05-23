@@ -177,6 +177,66 @@ export const downloadReceiptPDF = async (req, res) => {
     }
 };
 
+// @desc    Firmar recibo y guardarlo localmente
+// @route   POST /api/receipts/:id/sign
+// @access  Private
+export const signReceipt = async (req, res) => {
+    const { id } = req.params;
+    const { signedInDisagreement, disagreementComment } = req.body;
+
+    const receipt = await Receipt.findOne({ _id: id, user: req.user.id });
+    if (!receipt) {
+        throw new AppError('Recibo no encontrado', 404);
+    }
+
+    if (receipt.firmaTrabajador) {
+        throw new AppError('El recibo ya fue firmado anteriormente', 400);
+    }
+
+    // Actualizar receipt
+    receipt.firmaTrabajador = true;
+    if (signedInDisagreement) {
+        receipt.signedInDisagreement = true;
+        receipt.disagreementComment = disagreementComment;
+    }
+
+    try {
+        // Generar PDF
+        const { generateReceiptPDF } = await import('../services/pdfService.js');
+        const pdfBuffer = await generateReceiptPDF(receipt.toObject(), req.user.plan);
+
+        // Guardar localmente
+        const fs = await import('fs');
+        const path = await import('path');
+        const { fileURLToPath } = await import('url');
+
+        const __filename = fileURLToPath(import.meta.url);
+        const __dirname = path.dirname(__filename);
+        
+        const uploadsDir = path.join(__dirname, '..', 'uploads', 'receipts');
+        if (!fs.existsSync(uploadsDir)) {
+            fs.mkdirSync(uploadsDir, { recursive: true });
+        }
+
+        const fileName = `recibo-${receipt._id}.pdf`;
+        const filePath = path.join(uploadsDir, fileName);
+        
+        fs.writeFileSync(filePath, pdfBuffer);
+        
+        receipt.pdfPath = `/uploads/receipts/${fileName}`;
+        await receipt.save();
+
+        res.status(200).json({
+            status: 'success',
+            message: 'Recibo firmado y guardado exitosamente',
+            data: receipt
+        });
+    } catch (error) {
+        console.error('Sign Receipt Error:', error);
+        throw new AppError(`Error firmando el recibo: ${error.message}`, 500);
+    }
+};
+
 import Formula from '../models/Formula.js';
 
 // @desc    Pre-calcular ítems de liquidación mensual
